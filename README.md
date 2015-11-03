@@ -1,10 +1,12 @@
- # VideoSegmentationLib
- ## Library for creating a spatio-temporal segmentation of a video.
+
+# VideoSegmentationLib
+## Library for creating a spatio-temporal segmentation of a video.
  
- ## To compile:
- ```bash
+## To compile
+ 
+```bash
  mkdir build
  cd build
  cmake ..
  make
- ```
+```
