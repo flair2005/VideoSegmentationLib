@@ -10,6 +10,10 @@
 
 #include "segment.h"
 
+
+//distance in pixels
+#define MAX_ALLOWED_DISTANCE 50
+
 namespace videoseg {
 
 class Atom {

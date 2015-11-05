@@ -78,6 +78,7 @@ int _main(int argc, char** argv) {
 int main(int argc, char** argv) {
 	cv::Mat original_img,contours_mat, gradient,grayGradient;
 	double threshold = 0.01;//0.05;
+	int starting_scale = 0;
 
 	if(argc < 4){
 		std::cout <<"Usage: $> ./segmenter <input img> <output path> <scales> [<use gpu, default 0=false>]"<< std::endl;
@@ -98,7 +99,7 @@ int main(int argc, char** argv) {
 	}
 
 	bool use_gpu = gpu > 0 ? true: false;
-	Segmentation segmentation(original_img,gpu,scales);
+	Segmentation segmentation(original_img,gpu,scales,starting_scale);
 	segmentation.segment_pyramid(threshold);
 	const vector<Segment*>& segments = segmentation.getSegmentsPyramid()[2];
 	vector<Atom*> atoms;

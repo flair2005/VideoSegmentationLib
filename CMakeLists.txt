@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project (VisualRepresentation)
 
-set(OpenCV_DIR "~/workspace/opencv/build")
-find_package( OpenCV REQUIRED)
+#set(OpenCV_DIR "~/workspace/opencv/build")
+find_package( OpenCV 2.4 REQUIRED)
 set(PCL_DIR "~/workspace/pcl/build/")
 find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
@@ -28,9 +28,9 @@ include_directories(${RELAX_LIB_PATH}/src/include)
 
 #link the Segmentation lib
 set(SEG_LIB_PATH /home/martin/workspace/SegmentationLib)
-ADD_LIBRARY(segLib STATIC IMPORTED)
+ADD_LIBRARY(segLib SHARED IMPORTED)
 SET_TARGET_PROPERTIES(segLib PROPERTIES
-    IMPORTED_LOCATION ${SEG_LIB_PATH}/build/libSEGMENTATION.a)
+    IMPORTED_LOCATION ${SEG_LIB_PATH}/build/libSEGMENTATION.so)
 include_directories(${SEG_LIB_PATH}/include )
 
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)

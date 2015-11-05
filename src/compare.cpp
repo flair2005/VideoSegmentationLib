@@ -43,6 +43,7 @@ string getFileName(const string& s) {
 int main(int argc, char** argv) {
 	cv::Mat img_1, img_2, contours_mat, gradient, grayGradient;
 	double threshold = 0.01; //0.05;
+	int starting_scale = 0;
 
 	if (argc < 5) {
 		std::cout
@@ -72,7 +73,7 @@ int main(int argc, char** argv) {
 	/*
 	 * process img_1
 	 */
-	Segmentation segmentation_1(img_1, gpu, scales);
+	Segmentation segmentation_1(img_1, gpu, scales, starting_scale);
 	segmentation_1.segment_pyramid(threshold);
 	const vector<Segment*>& segments_1 = segmentation_1.getSegmentsPyramid()[2];
 	vector<Atom*> atoms_1;
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
 	 * process img_2
 	 */
 	Atom::static_id = 0;
-	Segmentation segmentation_2(img_2, gpu, scales);
+	Segmentation segmentation_2(img_2, gpu, scales, starting_scale);
 	segmentation_2.segment_pyramid(threshold);
 	const vector<Segment*>& segments_2 = segmentation_2.getSegmentsPyramid()[2];
 	vector<Atom*> atoms_2;

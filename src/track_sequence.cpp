@@ -45,6 +45,7 @@ string getFileName(const string& s) {
 int main(int argc, char** argv) {
 
 	int scale = 2;
+	int starting_scale = 0;
 	if (argc < 4) {
 		std::cout
 				<< "Usage: $> ./segmenter <images.txt>  <output path> <scales> [<use gpu, default 0=false>]"
@@ -95,7 +96,7 @@ int main(int argc, char** argv) {
 		/*
 		 * process img_1
 		 */
-		Segmentation segmentation_1(img_1, gpu, scales);
+		Segmentation segmentation_1(img_1, gpu, scales, starting_scale);
 		segmentation_1.segment_pyramid(threshold);
 		if(i>0)
 			segmentation_1.reset_colours(scale,colours);
@@ -116,7 +117,7 @@ int main(int argc, char** argv) {
 		 * process img_2
 		 */
 		Atom::static_id = 0;
-		Segmentation segmentation_2(img_2, gpu, scales);
+		Segmentation segmentation_2(img_2, gpu, scales, starting_scale);
 		segmentation_2.segment_pyramid(threshold);
 		const vector<Segment*>& segments_2 =
 				segmentation_2.getSegmentsPyramid()[scale];

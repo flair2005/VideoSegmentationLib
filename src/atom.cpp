@@ -28,9 +28,15 @@ Atom::~Atom() {
 
 double Atom::similarity(const Atom& other) const{
 
-//	double score_h = compareHist(segment_->getHHist(),other.segment_->getHHist(),CV_COMP_INTERSECT);
-//	double score_s = compareHist(segment_->getSHist(),other.segment_->getSHist(),CV_COMP_INTERSECT);
-//	double score_v = compareHist(segment_->getVHist(),other.segment_->getVHist(),CV_COMP_INTERSECT);
+
+	//check whether the two segments are too far away
+
+	Point2i distance_centers = segment_->getCenter() - other.segment_->getCenter();
+	double dist = sqrt(distance_centers.x*distance_centers.x + distance_centers.y*distance_centers.y);
+	if(dist > MAX_ALLOWED_DISTANCE)
+		return 0;
+
+
 	double score_h = .5*(compareHist(segment_->getHHist(),other.segment_->getHHist(), CV_COMP_CORREL)+1);
 	double score_s = .5*(compareHist(segment_->getSHist(),other.segment_->getSHist(), CV_COMP_CORREL)+1);
 	double score_v = .5*(compareHist(segment_->getVHist(),other.segment_->getVHist(), CV_COMP_CORREL)+1);
