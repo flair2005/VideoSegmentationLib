@@ -74,7 +74,7 @@ double Atom::similarity(const Atom& other) const{
 	double score_hsv = score_h*score_s*score_v;
 
 	//return (score_h+score_s+score_v);
-	return score_pca+score_hsv;
+	return (score_pca+score_hsv)*0.5;
 
 }
 

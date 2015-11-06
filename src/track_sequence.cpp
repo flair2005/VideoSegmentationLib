@@ -32,17 +32,7 @@ using namespace boost;
 using namespace videoseg;
 //using namespace std;
 
-string getFileName(const string& s) {
 
-	char sep = '/';
-
-	size_t i = s.rfind(sep, s.length());
-	if (i != string::npos) {
-		return (s.substr(i + 1, s.length() - i));
-	}
-
-	return ("");
-}
 
 int main(int argc, char** argv) {
 
@@ -72,17 +62,22 @@ int main(int argc, char** argv) {
 
 	cout << " reading input..." << argv[1] << endl;
 	vector<Vec3b> colours;
-	for (int i = 0, j = i + 1; i < images_list.size() - 1; i++, j++) {
+	unsigned int images = images_list.size() - 1;
+
+	for (unsigned int i = 0, j = i + 1; i < images-1; i++, j++) {
 
 		cv::Mat img_1, img_2, contours_mat, gradient, grayGradient;
 
 
 		cout <<images_list[i]<<" <--> "<<images_list[j]<<endl;
+
 		img_1 = cv::imread(images_list[i], -1);
 		img_2 = cv::imread(images_list[j], -1);
 
-		string prefix_1 = getFileName(images_list[i]);
-		string prefix_2 = getFileName(images_list[j]);
+		string prefix_1 = utils.get_file_name(images_list[i]);
+		prefix_1 = utils.remove_extension(prefix_1);
+		string prefix_2 = utils.get_file_name(images_list[j]);
+		prefix_2 = utils.remove_extension(prefix_2);
 		cout << "outputPath=" << output_path << endl << " prefix_1=" << prefix_1
 				<< endl << " prefix_2=" << prefix_2 << endl;
 

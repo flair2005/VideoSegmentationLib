@@ -50,7 +50,8 @@ VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string pre
 	//iterate_nodes();
 	//iterate_edges();
 	Visualisation vis;
-	vis.write_gv_file(g_,"graphviz",prefix);
+	cout <<"prefix="<<prefix<<endl;
+	vis.write_gv_file(g_,prefix,prefix);
 
 }
 

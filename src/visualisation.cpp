@@ -67,7 +67,7 @@ void Visualisation::print_mat_adjacent_nodes(std::ofstream& dotFile,
 void Visualisation::writeDot(MyAtomGraph& g, string fileName, string prefix) {
 
 	ofstream dotFile;
-	fileName = fileName + ".gv";
+	fileName = "nodemats/"+fileName + ".gv";
 	dotFile.open(fileName.c_str());
 	dotFile << "graph g {\n";
 
