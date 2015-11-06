@@ -9,7 +9,7 @@ include_directories(${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 #add_definitions(${PCL_DEFINITIONS})
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-find_package(Boost REQUIRED graph)
+find_package(Boost REQUIRED graph program_options)
 find_package(GraphViz REQUIRED)
 
 
@@ -51,13 +51,13 @@ ${PROJECT_SOURCE_DIR}/visualisation.cpp
 
 
 add_executable (test src/testgraphs.cpp)
-target_link_libraries (test VR_LIBRARY  ${Boost_GRAPH_LIBRARY} ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib  ${PCL_LIBRARIES} ${OpenCV_LIBS})
-
+target_link_libraries (test VR_LIBRARY ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
+# ${Boost_GRAPH_LIBRARY}
 add_executable (compare src/compare.cpp)
-target_link_libraries (compare VR_LIBRARY  ${Boost_GRAPH_LIBRARY} ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries (compare VR_LIBRARY  ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 add_executable (track src/track_sequence.cpp)
-target_link_libraries (track VR_LIBRARY  ${Boost_GRAPH_LIBRARY} ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries (track VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 
 #Continue with subdirectory

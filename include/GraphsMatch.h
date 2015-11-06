@@ -30,11 +30,19 @@ public:
 
 	void getMats(Mat& seg1,Mat& seg2);
 
+	void structural();
+
 	virtual ~GraphsMatch();
 
 private:
 	VisualRepresentation visual_repr_1_,visual_repr_2_;
 	vector< vector <double > > scores_;
+
+	inline const Atom& g1_get_atom(MyAtomGraph::vertex_iter i);
+
+	inline const Atom& g2_get_atom(MyAtomGraph::vertex_iter j);
+
+	void get_neighbours(VisualRepresentation& visual_repr,MyAtomGraph::Vertex& node, vector<int> ids);
 
 
 

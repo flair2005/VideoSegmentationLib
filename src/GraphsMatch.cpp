@@ -16,6 +16,54 @@ GraphsMatch::GraphsMatch(VisualRepresentation& visual_repr_1,VisualRepresentatio
 
 }
 
+const Atom& GraphsMatch::g1_get_atom(MyAtomGraph::vertex_iter i){
+	return visual_repr_1_.getG().properties(*i);
+}
+
+const Atom& GraphsMatch::g2_get_atom(MyAtomGraph::vertex_iter j){
+	return visual_repr_2_.getG().properties(*j);
+}
+
+void GraphsMatch::get_neighbours(VisualRepresentation& visual_repr, MyAtomGraph::Vertex& node, vector<int> ids){
+
+	MyAtomGraph::adjacency_iter i, end;
+	for (tie(i, end) = visual_repr.getG().getAdjacentVertices(node); i != end; ++i) {
+		auto neighbour = *i;
+		//cout << visual_repr.getG().properties(node).id <<" -> " << visual_repr.getG().properties(neighbour).id << ";" <<endl;
+	}
+
+}
+
+void GraphsMatch::structural(){
+
+	//iterate over the nodes of graph 1
+	MyAtomGraph::vertex_iter i, end;
+	for (tie(i, end) = visual_repr_1_.getG().getVertices(); i != end; ++i) {
+		//get the node
+		MyAtomGraph::Vertex node_u1 = *i;
+		vector<int> neighbours;
+		get_neighbours(visual_repr_1_,node_u1,neighbours);
+		const Atom&  atom_u1 = g1_get_atom(i);
+		//get its neighbours' indexes
+
+	}
+
+}
+
+/*
+ *  It pre-computes the scores array of similarity
+ *  between nodes from graphs G1 and G2.
+ *
+ *	scores is a 2-D array of doubles that contains
+ *	the similarity scores between nodes
+ *
+ *        v2.id
+ *        ----------
+ * u1.id |	|	|	|
+ *       |	|	|	|
+ *       |	|	|	|
+ * 		 ------------
+ */
 void GraphsMatch::precompute_scores(){
 
 	//allocate memory: +0 since the atom ids start with 0
@@ -38,15 +86,14 @@ void GraphsMatch::precompute_scores(){
 			const Atom& atom_v2=visual_repr_2_.getG().properties(node_v2);
 			double score = atom_u1.similarity(atom_v2);
 			scores_[atom_u1.id][atom_v2.id] = score;
-			cout <<"scores_["<<atom_u1.id<<"]["<<atom_v2.id<<"] ="<<score<<endl;
+			//cout <<"scores_["<<atom_u1.id<<"]["<<atom_v2.id<<"] ="<<score<<endl;
 		}
-//		std::cout << "> " << g_.properties(node).id << " adjacent nodes= ";
-//		//get adjacent nodes
-//		print_adjacent_nodes(node);
-//		std::cout << std::endl;
-
 	}
+	//structural similarities
+	structural();
 }
+
+
 
 void GraphsMatch::find_match(){
 	for(int i=0;i<visual_repr_1_.getSegments();i++){
@@ -68,8 +115,8 @@ void GraphsMatch::find_match(){
 		Segment* seg2 = visual_repr_2_.getAtoms()[match]->segment_;
 
 		seg2->re_colour(seg1->getRandomColour());
-		cout <<"node U1 "<<visual_repr_1_.getAtoms()[i]->id <<" matched to "<<match<<endl;
-		cout <<"colours set as: "<<seg1->getRandomColour()<<" "<<seg2->getRandomColour()<<endl;
+		//cout <<"node U1 "<<visual_repr_1_.getAtoms()[i]->id <<" matched to "<<match<<endl;
+		//cout <<"colours set as: "<<seg1->getRandomColour()<<" "<<seg2->getRandomColour()<<endl;
 
 	}
 

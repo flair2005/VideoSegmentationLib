@@ -23,7 +23,7 @@ VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string pre
 	vector<MyAtomGraph::Vertex> vertices(atoms.size());
 	for (Atom* atom : atoms) {
 		MyAtomGraph::Vertex u = g_.AddVertex(*atom);
-		cout <<"atom->id="<<atom->id <<" vertices.size()="<<vertices.size()<<endl;
+		//cout <<"atom->id="<<atom->id <<" vertices.size()="<<vertices.size()<<endl;
 		vertices[atom->id] = u;
 
 	}
@@ -67,7 +67,7 @@ void VisualRepresentation::compare_to(VisualRepresentation& visual_rep_2){
 		for(Atom* atom_v2 : visual_rep_2.atoms_){
 
 			double score=atom_u1->similarity(*atom_v2);
-			cout <<"score="<<score<<endl;
+			//cout <<"score="<<score<<endl;
 			if(score>max){
 				max = score;
 				max_atom = atom_v2;

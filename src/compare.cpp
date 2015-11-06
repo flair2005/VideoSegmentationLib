@@ -43,7 +43,7 @@ string getFileName(const string& s) {
 int main(int argc, char** argv) {
 	cv::Mat img_1, img_2, contours_mat, gradient, grayGradient;
 	double threshold = 0.01; //0.05;
-	int starting_scale = 0;
+	int starting_scale = 1;
 
 	if (argc < 5) {
 		std::cout
