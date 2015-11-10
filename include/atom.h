@@ -25,7 +25,7 @@ public:
 	Atom(const Atom& other); // user-defined copy cto
 	virtual ~Atom();
 
-	double similarity(const Atom& other) const;
+	double similarity(const Atom* other) const;
 
 	const Point2i& getCenter() const;
 

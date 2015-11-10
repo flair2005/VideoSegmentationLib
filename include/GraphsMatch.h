@@ -48,11 +48,11 @@ private:
 
 	void generate_permutations(vector< vector<int> >& permutations,vector<int>& adj_vector);
 
-	inline const Atom& g1_get_atom(MyAtomGraph::vertex_iter i);
+	inline const AtomRef& g1_get_atom(MyUniqueAtomGraph::vertex_iter i);
 
-	inline const Atom& g2_get_atom(MyAtomGraph::vertex_iter j);
+	inline const AtomRef& g2_get_atom(MyUniqueAtomGraph::vertex_iter j);
 
-	void get_neighbours(VisualRepresentation& visual_repr,MyAtomGraph::Vertex& node, vector<int>& ids);
+	void get_neighbours(VisualRepresentation& visual_repr,MyUniqueAtomGraph::Vertex& node, vector<int>& ids);
 
 	double probability(double similarity);
 

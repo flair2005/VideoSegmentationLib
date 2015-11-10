@@ -21,11 +21,11 @@ GraphsMatch::GraphsMatch(VisualRepresentation& visual_repr_1,
 
 }
 
-const Atom& GraphsMatch::g1_get_atom(MyAtomGraph::vertex_iter i) {
+const AtomRef& GraphsMatch::g1_get_atom(MyUniqueAtomGraph::vertex_iter i) {
 	return visual_repr_1_.getG().properties(*i);
 }
 
-const Atom& GraphsMatch::g2_get_atom(MyAtomGraph::vertex_iter j) {
+const AtomRef& GraphsMatch::g2_get_atom(MyUniqueAtomGraph::vertex_iter j) {
 	return visual_repr_2_.getG().properties(*j);
 }
 
@@ -44,32 +44,33 @@ bool c1_ptr_less(const atom_struct &s1, const atom_struct &s2) {
 }
 
 void GraphsMatch::get_neighbours(VisualRepresentation& visual_repr,
-		MyAtomGraph::Vertex& node, vector<int>& ids) {
+		MyUniqueAtomGraph::Vertex& node, vector<int>& ids) {
 
-	MyAtomGraph::adjacency_iter i, end;
+	MyUniqueAtomGraph::adjacency_iter i, end;
 	vector<atom_struct> atoms;
-	const Atom& atom1 = visual_repr.getG().properties(node);
-	//cout <<"Neighbours of u1="<<atom1.id<<" ";
+	const AtomRef& atom1 = visual_repr.getG().properties(node);
+
+	//cout <<"Neighbours of u1="<<atom1->id<<" ";
 	for (tie(i, end) = visual_repr.getG().getAdjacentVertices(node); i != end;
 			++i) {
 		auto neighbour = *i;
 
 		//see the angle
 
-		const Atom& atom2 = visual_repr.getG().properties(neighbour);
+		const AtomRef& atom2 = visual_repr.getG().properties(neighbour);
 
 		double angle = atan2(
-				atom2.segment_->getCenter().x - atom1.segment_->getCenter().x,
-				atom2.segment_->getCenter().y - atom1.segment_->getCenter().y);
-		atom_struct a(atom2.id, angle);
+				atom2.atom_ptr->segment_->getCenter().x - atom1.atom_ptr->segment_->getCenter().x,
+				atom2.atom_ptr->segment_->getCenter().y - atom1.atom_ptr->segment_->getCenter().y);
+		atom_struct a(atom2.atom_ptr->id, angle);
 
-		//cout << visual_repr.getG().properties(node).id <<" -> " << visual_repr.getG().properties(neighbour).id << "; angle= "<<visual_repr.getG().properties(neighbour).angle <<endl;
+		//cout << visual_repr.getG().properties(node)->id <<" -> " << visual_repr.getG().properties(neighbour)->id << "; angle= "<<visual_repr.getG().properties(neighbour).angle <<endl;
 		atoms.push_back(a);
 
 	}
 	std::sort(atoms.begin(), atoms.end(), &c1_ptr_less);
-	for (int k = 0; k < atoms.size(); k++) {
-		//cout <<" id ="<<atoms[k].id<<" angle="<<atoms[k].angle<<endl;
+	for (unsigned int k = 0; k < atoms.size(); k++) {
+		//cout <<" id ="<<atoms[k]->id<<" angle="<<atoms[k].angle<<endl;
 		ids.push_back(atoms[k].id);
 	}
 	//cout <<" ----"<<endl;
@@ -80,13 +81,12 @@ double GraphsMatch::solve_assignment(vector<int>& adj_vector_u1,
 		vector<int>& adj_vector_v2) {
 	hungarian_problem_t p;
 
-	int **cost_matrix;
-	cost_matrix = new int*[adj_vector_u1.size()];
-	for (int i = 0; i < adj_vector_u1.size(); i++)
+	int **cost_matrix = new int*[adj_vector_u1.size()];
+	for (unsigned int i = 0; i < adj_vector_u1.size(); i++)
 		cost_matrix[i] = new int[adj_vector_v2.size()];
 
-	for (int i = 0; i < adj_vector_u1.size(); i++) {
-		for (int j = 0; j < adj_vector_v2.size(); j++) {
+	for (unsigned int i = 0; i < adj_vector_u1.size(); i++) {
+		for (unsigned int j = 0; j < adj_vector_v2.size(); j++) {
 			cost_matrix[i][j] = 1000
 					* appearance_scores_[adj_vector_u1[i]][adj_vector_v2[j]];
 		}
@@ -113,9 +113,9 @@ double GraphsMatch::solve_assignment(vector<int>& adj_vector_u1,
 
 	//print the mapping
 	double total_cost = 1.;
-	for (int i = 0; i < adj_vector_u1.size(); i++){
+	for (unsigned int i = 0; i < adj_vector_u1.size(); i++){
 		//cout << "Node U1: "<<adj_vector_u1[i]<<" mapped to V2: ";
-		for (int j = 0; j < adj_vector_v2.size(); j++){
+		for (unsigned int j = 0; j < adj_vector_v2.size(); j++){
 			if(p.assignment[i][j] == 1){
 				//cout << adj_vector_v2[j]<<endl;
 				total_cost+= (0.001*cost_matrix[i][j]);
@@ -127,7 +127,7 @@ double GraphsMatch::solve_assignment(vector<int>& adj_vector_u1,
 	else
 		total_cost /= adj_vector_u1.size();
 
-	for (int i = 0; i < adj_vector_u1.size(); i++)
+	for (unsigned int i = 0; i < adj_vector_u1.size(); i++)
 		delete cost_matrix[i];
 	delete cost_matrix;
 	hungarian_free(&p);
@@ -168,7 +168,7 @@ void GraphsMatch::generate_permutations(vector<vector<int> >& permutations,
 }
 
 void GraphsMatch::print_vector(vector<int>& vect) {
-	for (int i = 0; i < vect.size(); i++) {
+	for (unsigned int i = 0; i < vect.size(); i++) {
 		cout << vect[i] << " ";
 	}
 	cout << endl;
@@ -190,12 +190,12 @@ double GraphsMatch::structural_similarity(vector<int>& ids_g1,
 	double acc_score = 1.;
 	unsigned int diff_size = 0;
 	if (ids_g1.size() <= ids_g2.size()) {
-		for (int i = 0; i < ids_g1.size(); i++) {
+		for (unsigned int i = 0; i < ids_g1.size(); i++) {
 			acc_score *= appearance_scores_[ids_g1[i]][ids_g2[i]];
 		}
 		diff_size = ids_g2.size() - ids_g1.size();
 	} else {
-		for (int i = 0; i < ids_g2.size(); i++) {
+		for (unsigned int i = 0; i < ids_g2.size(); i++) {
 			acc_score *= appearance_scores_[ids_g1[i]][ids_g2[i]];
 		}
 		diff_size = ids_g1.size() - ids_g2.size();
@@ -209,33 +209,33 @@ double GraphsMatch::structural_similarity(vector<int>& ids_g1,
 void GraphsMatch::structural() {
 
 	//iterate over the nodes of graph 1
-	MyAtomGraph::vertex_iter i, end;
+	MyUniqueAtomGraph::vertex_iter i, end;
 	for (tie(i, end) = visual_repr_1_.getG().getVertices(); i != end; ++i) {
 		//get the node
-		MyAtomGraph::Vertex node_u1 = *i;
+		MyUniqueAtomGraph::Vertex node_u1 = *i;
 		vector<int> neighbours_u1;
 		get_neighbours(visual_repr_1_, node_u1, neighbours_u1);
-		const Atom& atom_u1 = g1_get_atom(i);
+		const AtomRef& atom_u1 = g1_get_atom(i);
 		//get its neighbours' indexes
-		cout << "Node u1: " << atom_u1.id << " neighbours: ";
+		cout << "Node u1: " << atom_u1.atom_ptr->id << " neighbours: ";
 		print_vector(neighbours_u1);
 
 		double best_candidate_score = -0.1;
 		int id_best_match = -1;
 		//iterate over the nodes of graph 2
-		MyAtomGraph::vertex_iter j, jend;
+		MyUniqueAtomGraph::vertex_iter j, jend;
 		for (tie(j, jend) = visual_repr_2_.getG().getVertices(); j != jend;
 				++j) {
-			MyAtomGraph::Vertex node_v2 = *j;
+			MyUniqueAtomGraph::Vertex node_v2 = *j;
 			vector<int> neighbours_v2;
 			get_neighbours(visual_repr_2_, node_v2, neighbours_v2);
-			const Atom& atom_v2 = g2_get_atom(j);
-			//cout <<"Node v2: "<<atom_v2.id <<" neighbours: ";
-			//if (atom_u1.id == 24 && atom_v2.id == 27) {
+			const AtomRef& atom_v2 = g2_get_atom(j);
+			//cout <<"Node v2: "<<atom_v2->id <<" neighbours: ";
+			//if (atom_u1->id == 24 && atom_v2->id == 27) {
 			//	print_vector(neighbours_v2);
 
 				double structural_score = solve_assignment(neighbours_u1, neighbours_v2);
-				structural_scores_[atom_u1.id][atom_v2.id] = structural_score;
+				structural_scores_[atom_u1.atom_ptr->id][atom_v2.atom_ptr->id] = structural_score;
 			//}
 
 			//generate permutations for the neighbours_u1 of node u1
@@ -252,7 +252,7 @@ void GraphsMatch::structural() {
 						max_score = struct_score;
 						best_permutation = k;
 					}
-					if (atom_u1.id == 21 && atom_v2.id == 25) {
+					if (atom_u1.atom_ptr->id == 21 && atom_v2.atom_ptr->id == 25) {
 						cout << "permutation #" << k << " with score= "
 								<< struct_score << endl;
 						print_vector(permutations[k]);
@@ -261,13 +261,13 @@ void GraphsMatch::structural() {
 					}
 
 				}
-				structural_scores_[atom_u1.id][atom_v2.id] = max_score;
+				structural_scores_[atom_u1.atom_ptr->id][atom_v2.atom_ptr->id] = max_score;
 
 				//cout <<"best permutation #"<<best_permutation<<" with score= "<<max_score<<endl;
 				//print_vector(permutations[best_permutation]);
 				if (max_score > best_candidate_score) {
 					best_candidate_score = max_score;
-					id_best_match = atom_v2.id;
+					id_best_match = atom_v2.atom_ptr->id;
 				}
 			}
 
@@ -286,9 +286,9 @@ void GraphsMatch::structural() {
  *	scores is a 2-D array of doubles that contains
  *	the similarity scores between nodes
  *
- *        v2.id
+ *        v2->id
  *        ----------
- * u1.id |	|	|	|
+ * u1->id |	|	|	|
  *       |	|	|	|
  *       |	|	|	|
  * 		 ------------
@@ -305,22 +305,22 @@ void GraphsMatch::precompute_scores() {
 	}
 
 	//iterate over the nodes of visual_rep_1
-	MyAtomGraph::vertex_iter i, end;
+	MyUniqueAtomGraph::vertex_iter i, end;
 	for (tie(i, end) = visual_repr_1_.getG().getVertices(); i != end; ++i) {
-		MyAtomGraph::Vertex node_u1 = *i;
-		const Atom& atom_u1 = visual_repr_1_.getG().properties(node_u1);
-		//cout << "> u1[" << visual_repr_1_.getG().properties(node_u1).id<<"]" <<endl;
+		MyUniqueAtomGraph::Vertex node_u1 = *i;
+		const AtomRef& atom_u1 = visual_repr_1_.getG().properties(node_u1);
+		//cout << "> u1[" << visual_repr_1_.getG().properties(node_u1)->id<<"]" <<endl;
 
 		//iterate over the nodes of visual_rep_2
-		MyAtomGraph::vertex_iter j, jend;
+		MyUniqueAtomGraph::vertex_iter j, jend;
 		for (tie(j, jend) = visual_repr_2_.getG().getVertices(); j != jend;
 				++j) {
-			MyAtomGraph::Vertex node_v2 = *j;
-			const Atom& atom_v2 = visual_repr_2_.getG().properties(node_v2);
-			double score = (atom_u1.similarity(atom_v2));
-			appearance_scores_[atom_u1.id][atom_v2.id] = probability(score);
+			MyUniqueAtomGraph::Vertex node_v2 = *j;
+			const AtomRef& atom_v2 = visual_repr_2_.getG().properties(node_v2);
+			double score = (atom_u1.atom_ptr->similarity(atom_v2.atom_ptr.get()));
+			appearance_scores_[atom_u1.atom_ptr->id][atom_v2.atom_ptr->id] = probability(score);
 
-			//cout <<"appearance_scores_["<<atom_u1.id<<"]["<<atom_v2.id<<"] ="<<score<<" prob="<<probability(score)<<endl;
+			//cout <<"appearance_scores_["<<atom_u1->id<<"]["<<atom_v2->id<<"] ="<<score<<" prob="<<probability(score)<<endl;
 		}
 	}
 	//structural similarities
@@ -341,15 +341,15 @@ void GraphsMatch::find_match() {
 				cout <<" Node U1: "<<i<<" V2:"<<j<<  " appearance score="<<appearance_scores_[i][j]<<" structural_score="<<structural_scores_[i][j] <<endl;
 			}
 		}
-		visual_repr_1_.getAtoms()[i]->id_matched_to = max_index_v2;
+		visual_repr_1_.getAtoms()[i].atom_ptr->id_matched_to = max_index_v2;
 	}
 
 	for (int i = 0; i < visual_repr_1_.getSegments(); i++) {
-		int match = visual_repr_1_.getAtoms()[i]->id_matched_to;
+		int match = visual_repr_1_.getAtoms()[i].atom_ptr->id_matched_to;
 		if (match < 0)
 			continue;
-		Segment* seg1 = visual_repr_1_.getAtoms()[i]->segment_;
-		Segment* seg2 = visual_repr_2_.getAtoms()[match]->segment_;
+		Segment* seg1 = visual_repr_1_.getAtoms()[i].atom_ptr->segment_;
+		Segment* seg2 = visual_repr_2_.getAtoms()[match].atom_ptr->segment_;
 
 		seg2->re_colour(seg1->getRandomColour());
 		//cout <<"node U1 "<<visual_repr_1_.getAtoms()[i]->id <<" matched to "<<match<<endl;

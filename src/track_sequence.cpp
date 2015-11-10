@@ -92,9 +92,9 @@ int main(int argc, char** argv) {
 			segmentation_1.reset_colours(scale_for_propagation,colours);
 		const vector<Segment*>& segments_1 =
 				segmentation_1.getSegmentsPyramid()[scale_for_propagation];
-		vector<Atom*> atoms_1;
+		vector<std::shared_ptr<Atom>> atoms_1;
 		for (Segment* seg : segments_1) {
-			Atom * atom = new Atom(seg);
+			std::shared_ptr<Atom> atom = std::make_shared<Atom>(seg);
 			atoms_1.push_back(atom);
 		}
 		cout << "> constructing visual representation 1" << endl;
@@ -111,9 +111,9 @@ int main(int argc, char** argv) {
 		segmentation_2.segment_pyramid(threshold);
 		const vector<Segment*>& segments_2 =
 				segmentation_2.getSegmentsPyramid()[scale_for_propagation];
-		vector<Atom*> atoms_2;
+		vector<std::shared_ptr<Atom>> atoms_2;
 		for (Segment* seg : segments_2) {
-			Atom * atom = new Atom(seg);
+			std::shared_ptr<Atom> atom =std::make_shared<Atom>(seg);
 			atoms_2.push_back(atom);
 		}
 		cout << "> constructing visual representation 2" << endl;

@@ -102,9 +102,9 @@ int main(int argc, char** argv) {
 	Segmentation segmentation(original_img,gpu,scales,starting_scale);
 	segmentation.segment_pyramid(threshold);
 	const vector<Segment*>& segments = segmentation.getSegmentsPyramid()[2];
-	vector<Atom*> atoms;
+	vector<std::shared_ptr<Atom>> atoms;
 	for(Segment* seg : segments){
-		Atom * atom = new Atom(seg);
+		std::shared_ptr<Atom> atom = std::make_shared<Atom>(seg);
 		atoms.push_back(atom);
 	}
 	cout <<"> constructing visual representation"<<endl;

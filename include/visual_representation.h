@@ -40,10 +40,13 @@ struct EdgeProperties {
 	}
 };
 
+struct AtomRef {
 
+	std::shared_ptr< Atom > atom_ptr;
+};
 
-typedef Graph<videoseg::Atom, EdgeProperties> MyAtomGraph;
-typedef Graph<std::unique_ptr <videoseg::Atom>, EdgeProperties> MyUniqueAtomGraph;
+typedef Graph<Atom, EdgeProperties> MyAtomGraph;
+typedef Graph< AtomRef , EdgeProperties > MyUniqueAtomGraph;
 
 
 
@@ -61,7 +64,7 @@ class VisualRepresentation {
 
 public:
 	VisualRepresentation();
-	VisualRepresentation(vector<Atom*>& atoms, std::string prefix);
+	VisualRepresentation(vector< std::shared_ptr<Atom> >& atoms, std::string prefix);
 	virtual ~VisualRepresentation();
 
 	void compare_to(VisualRepresentation& visual_rep_2);
@@ -74,29 +77,29 @@ public:
 		return segments;
 	}
 
-	const vector<MyAtomGraph::Vertex*>& getVertices() const {
+	const vector<MyUniqueAtomGraph::Vertex*>& getVertices() const {
 		return vertices_;
 	}
 
-	const MyAtomGraph& getG() const {
+	const MyUniqueAtomGraph& getG() const {
 		return g_;
 	}
 
-	const vector<Atom*>& getAtoms() const {
+	const vector< AtomRef >& getAtoms() const {
 		return atoms_;
 	}
 
 	void get_segmentation_mat(Mat& seg);
 
 private:
-	bool attached_to(Atom& atom1, Atom& atom2);
-	void print_adjacent_nodes(MyAtomGraph::Vertex& node);
+	bool attached_to(std::shared_ptr<Atom> atom1, std::shared_ptr<Atom> atom2);
+	void print_adjacent_nodes(MyUniqueAtomGraph::Vertex& node);
 	void iterate_nodes();
 	void iterate_edges();
 protected:
-	MyAtomGraph g_;
-	vector<MyAtomGraph::Vertex*> vertices_;
-	vector<Atom*> atoms_;
+	MyUniqueAtomGraph g_;
+	vector<MyUniqueAtomGraph::Vertex*> vertices_;
+	vector< AtomRef > atoms_;
 	int segments;
 
 };

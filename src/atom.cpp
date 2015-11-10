@@ -39,45 +39,45 @@ const Point2i& Atom::getCenter() const{
 }
 
 
-double Atom::similarity(const Atom& other) const{
+double Atom::similarity(const Atom* other) const{
 
 
 	//check whether the two segments are too far away
 
-	Point2i distance_centers = segment_->getCenter() - other.segment_->getCenter();
+	Point2i distance_centers = segment_->getCenter() - other->segment_->getCenter();
 	double dist = sqrt(distance_centers.x*distance_centers.x + distance_centers.y*distance_centers.y);
 	if(dist > MAX_ALLOWED_DISTANCE)
 		return 0;
 
 
-	double score_h = .5*(compareHist(segment_->getHHist(),other.segment_->getHHist(), CV_COMP_CORREL)+1);
-	double score_s = .5*(compareHist(segment_->getSHist(),other.segment_->getSHist(), CV_COMP_CORREL)+1);
-	double score_v = .5*(compareHist(segment_->getVHist(),other.segment_->getVHist(), CV_COMP_CORREL)+1);
+	double score_h = .5*(compareHist(segment_->getHHist(),other->segment_->getHHist(), CV_COMP_CORREL)+1);
+	double score_s = .5*(compareHist(segment_->getSHist(),other->segment_->getSHist(), CV_COMP_CORREL)+1);
+	double score_v = .5*(compareHist(segment_->getVHist(),other->segment_->getVHist(), CV_COMP_CORREL)+1);
 
 //	cout << "scores for HSV= " << score_h << "," << score_s << "," << score_v
 //			<< "," << endl;
 //	cout << "HSV score=" << (score_h + score_s + score_v) << endl;
 
 	double module_1 =
-			segment_->getEigenVal()[0] > other.segment_->getEigenVal()[0] ?
-					other.segment_->getEigenVal()[0]
+			segment_->getEigenVal()[0] > other->segment_->getEigenVal()[0] ?
+					other->segment_->getEigenVal()[0]
 							/ segment_->getEigenVal()[0] :
 					segment_->getEigenVal()[0]
-							/ other.segment_->getEigenVal()[0];
+							/ other->segment_->getEigenVal()[0];
 
-	double angle_1 = segment_->getOrientations()[0] > other.segment_->getOrientations()[0] ? other.segment_->getOrientations()[0]/segment_->getOrientations()[0] : segment_->getOrientations()[0]/other.segment_->getOrientations()[0];
+	double angle_1 = segment_->getOrientations()[0] > other->segment_->getOrientations()[0] ? other->segment_->getOrientations()[0]/segment_->getOrientations()[0] : segment_->getOrientations()[0]/other->segment_->getOrientations()[0];
 
 
 	double module_2 =
-			segment_->getEigenVal()[1] > other.segment_->getEigenVal()[1] ?
-					other.segment_->getEigenVal()[1]
+			segment_->getEigenVal()[1] > other->segment_->getEigenVal()[1] ?
+					other->segment_->getEigenVal()[1]
 							/ segment_->getEigenVal()[1] :
 					segment_->getEigenVal()[1]
-							/ other.segment_->getEigenVal()[1];
+							/ other->segment_->getEigenVal()[1];
 
 //	cout <<" segment angle="<<segment_->getOrientations()[1]<<endl;
-//	cout <<" other.segment angle="<<other.segment_->getOrientations()[1]<<endl;
-	double angle_2 = segment_->getOrientations()[1] > other.segment_->getOrientations()[1] ? other.segment_->getOrientations()[1]/segment_->getOrientations()[1] : segment_->getOrientations()[1]/other.segment_->getOrientations()[1];
+//	cout <<" other->segment angle="<<other->segment_->getOrientations()[1]<<endl;
+	double angle_2 = segment_->getOrientations()[1] > other->segment_->getOrientations()[1] ? other->segment_->getOrientations()[1]/segment_->getOrientations()[1] : segment_->getOrientations()[1]/other->segment_->getOrientations()[1];
 
 
 //	cout << "PCA_1=" << module_1 << " angle_1= "<<angle_1<< endl;
