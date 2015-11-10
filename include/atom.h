@@ -22,13 +22,18 @@ class Atom {
 public:
 	Atom();
 	Atom(Segment* segment);
+	Atom(const Atom& other); // user-defined copy cto
 	virtual ~Atom();
 
 	double similarity(const Atom& other) const;
 
+	const Point2i& getCenter() const;
+
 	int id;
 	int id_matched_to;
 	Segment* segment_;
+	double angle;
+
 
 	static int static_id;
 };

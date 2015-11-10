@@ -15,6 +15,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include "atom.h"
 #include "atom_graphs.h"
+#include <memory>
 
 using namespace boost;
 using namespace videoseg;
@@ -22,14 +23,28 @@ using namespace std;
 
 struct EdgeProperties {
 
-	EdgeProperties():source(-1),dest(-1){};
+	EdgeProperties():source(-1),dest(-1),angle(0.){};
 	EdgeProperties(int source,int dest):
-		source(source),dest(dest){};
+		source(source),dest(dest),angle(0.){};
+	EdgeProperties(int source,int dest, double angle):
+			source(source),dest(dest),angle(angle){};
 
 	int source;
 	int dest;
+	double angle;
+
+	bool operator>(const EdgeProperties &e2) const
+	{
+		//cout << "operator trick"<<endl;
+		return angle > e2.angle;
+	}
 };
+
+
+
 typedef Graph<videoseg::Atom, EdgeProperties> MyAtomGraph;
+typedef Graph<std::unique_ptr <videoseg::Atom>, EdgeProperties> MyUniqueAtomGraph;
+
 
 
 struct VertexProperties {

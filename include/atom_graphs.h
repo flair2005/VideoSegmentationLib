@@ -18,6 +18,9 @@
 #include <boost/property_map/property_map.hpp>
 #include <boost/static_assert.hpp>
 
+
+struct EdgeProperties;
+
 using namespace boost;
 
 /* definition of basic boost::graph properties */
@@ -30,6 +33,75 @@ enum edge_properties_t {
 namespace boost {
 BOOST_INSTALL_PROPERTY(vertex, properties);BOOST_INSTALL_PROPERTY(edge, properties);}
 
+/*
+ * Class for sorting the edges according to their angle
+ */
+template<class T> struct Sorted_list
+{
+  std::list<T> v;
+
+public:
+  typedef T value_type;
+  typedef typename std::list<T>::size_type size_type;
+  typedef typename std::list<T>::iterator iterator;
+
+
+
+  iterator insert(const T& x)
+  {
+    Sorted_list<T>::iterator i = v.begin();
+
+
+    string edgePropName = typeid(EdgeProperties).name();
+    auto& element_i = (*i).get_property().m_value;
+    auto& element_x = x.get_property().m_value;
+
+
+    //cout <<"angle="<<element.angle<<endl;
+    while(i != v.end() && element_x > element_i)
+    {
+      i++;
+    }
+
+    return v.insert(i, x);
+  }
+
+  iterator begin() { return v.begin(); }
+  iterator end() { return v.end(); }
+
+  size_type size() const { return v.size(); }
+};
+
+struct SlistS {};
+
+namespace boost {
+  template <class ValueType> struct container_gen<SlistS, ValueType>
+  {
+    typedef Sorted_list<ValueType> type;
+  };
+
+  struct sorted_list_tag {};
+
+  template<class T> sorted_list_tag container_category(Sorted_list<T>&)
+  {
+    return sorted_list_tag();
+  }
+
+  template<class T> std::pair<typename Sorted_list<T>::iterator, bool>
+  push_dispatch(Sorted_list<T>& v, const T& x, sorted_list_tag)
+  {
+    return std::make_pair(v.insert(x), true);
+  }
+
+  template <> struct parallel_edge_traits<SlistS> {
+    typedef allow_parallel_edge_tag type;
+  };
+}
+/*
+ * END OF Class for sorting the edges according to their angle
+ */
+
+
 /* the graph base class template */
 template<typename VERTEXPROPERTIES, typename EDGEPROPERTIES>
 class Graph {
@@ -38,6 +110,7 @@ public:
 	/* an adjacency_list like we need it */
 	typedef adjacency_list<
 			setS, // disallow parallel edges
+			//SlistS, //sorted edges by angle?
 			listS, // vertex container
 			undirectedS, // UNdirected graph
 			property<vertex_properties_t, VERTEXPROPERTIES>,

@@ -35,12 +35,16 @@ public:
 	virtual ~GraphsMatch();
 
 private:
-	VisualRepresentation visual_repr_1_,visual_repr_2_;
+	VisualRepresentation& visual_repr_1_,visual_repr_2_;
 
 	vector< vector <double > > appearance_scores_;
 	vector< vector <double > > structural_scores_;
 
 	void print_vector(vector<int>& vect);
+
+	double solve_assignment(vector<int>& adj_vector_u1,vector<int>& adj_vector_v2);
+
+	void generate_factorial_permutations(vector<vector<int> >& permutations,vector<int>& adj_vector);
 
 	void generate_permutations(vector< vector<int> >& permutations,vector<int>& adj_vector);
 
@@ -54,7 +58,7 @@ private:
 
 	double structural_similarity(vector<int>& ids_g1,vector<int>& ids_g2);
 
-	const int p_err = 0.4;
+	const int p_err = 0.5;
 
 
 

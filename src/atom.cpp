@@ -22,9 +22,22 @@ Atom::Atom(Segment* segment) :
 
 }
 
+Atom::Atom(const Atom& other):
+		segment_(other.segment_),id(other.id),id_matched_to(other.id_matched_to){
+
+}
+
+
+
 Atom::~Atom() {
+	//cout <<"deleting Atom"<<endl;
 	// TODO Auto-generated destructor stub
 }
+
+const Point2i& Atom::getCenter() const{
+	return segment_->getCenter();
+}
+
 
 double Atom::similarity(const Atom& other) const{
 

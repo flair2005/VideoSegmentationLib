@@ -14,12 +14,13 @@ namespace videoseg {
 
 VisualRepresentation::VisualRepresentation() {
 	// TODO Auto-generated constructor stub
-
+	cout <<"VisualRepresentation::VisualRepresentation()"<<endl;
 }
 
 VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string prefix):
 		atoms_(atoms),segments(atoms.size()){
 
+	cout <<"VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string prefix)"<<this <<endl;
 	vector<MyAtomGraph::Vertex> vertices(atoms.size());
 	for (Atom* atom : atoms) {
 		MyAtomGraph::Vertex u = g_.AddVertex(*atom);
@@ -27,6 +28,7 @@ VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string pre
 		vertices[atom->id] = u;
 
 	}
+
 
 	for (int i = 0; i < atoms.size(); i++) {
 		for (int j = i + 1; j < atoms.size(); j++) {
@@ -38,7 +40,9 @@ VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string pre
 					const Mat& seg1_mat = atom1->segment_->getRandomColourMat();
 					const Mat& seg2_mat = atom2->segment_->getRandomColourMat();
 
-					EdgeProperties edge_props(atom1->id,atom2->id);
+					double angle = atan2(atom2->segment_->getCenter().x - atom1->segment_->getCenter().x,
+							atom2->segment_->getCenter().y - atom1->segment_->getCenter().y);
+					EdgeProperties edge_props(atom1->id,atom2->id,angle);
 					g_.AddEdge(vertices[atom1->id], vertices[atom2->id],
 							edge_props);
 
@@ -46,6 +50,7 @@ VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string pre
 			}
 		}
 	}
+
 	//DEBUG
 	//iterate_nodes();
 	//iterate_edges();
@@ -53,10 +58,15 @@ VisualRepresentation::VisualRepresentation(vector<Atom*>& atoms, std::string pre
 	cout <<"prefix="<<prefix<<endl;
 	vis.write_gv_file(g_,prefix,prefix);
 
+
 }
 
 VisualRepresentation::~VisualRepresentation() {
 // TODO Auto-generated destructor stub
+	cout <<"~VisualRepresentation() :<<"<< this <<"atoms_.size()="<<atoms_.size()<<endl;
+	for(Atom* atom: atoms_)
+		delete atom;
+
 }
 
 void VisualRepresentation::compare_to(VisualRepresentation& visual_rep_2){

@@ -137,6 +137,7 @@ int main(int argc, char** argv) {
 
 		//save the colours of representation 1
 		segmentation_2.save_colours(scale_for_propagation,colours);
+		cout <<" ----- iteration finished -------"<<endl;
 
 	}
 
