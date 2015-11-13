@@ -217,8 +217,8 @@ void GraphsMatch::structural() {
 		get_neighbours(visual_repr_1_, node_u1, neighbours_u1);
 		const AtomRef& atom_u1 = g1_get_atom(i);
 		//get its neighbours' indexes
-		cout << "Node u1: " << atom_u1.atom_ptr->id << " neighbours: ";
-		print_vector(neighbours_u1);
+		//cout << "Node u1: " << atom_u1.atom_ptr->id << " neighbours: ";
+		//print_vector(neighbours_u1);
 
 		double best_candidate_score = -0.1;
 		int id_best_match = -1;
@@ -234,8 +234,8 @@ void GraphsMatch::structural() {
 			//if (atom_u1->id == 24 && atom_v2->id == 27) {
 			//	print_vector(neighbours_v2);
 
-				double structural_score = solve_assignment(neighbours_u1, neighbours_v2);
-				structural_scores_[atom_u1.atom_ptr->id][atom_v2.atom_ptr->id] = structural_score;
+			double structural_score = solve_assignment(neighbours_u1, neighbours_v2);
+			structural_scores_[atom_u1.atom_ptr->id][atom_v2.atom_ptr->id] = structural_score;
 			//}
 
 			//generate permutations for the neighbours_u1 of node u1
@@ -296,7 +296,7 @@ void GraphsMatch::structural() {
 void GraphsMatch::precompute_scores() {
 
 	//allocate memory: +0 since the atom ids start with 0
-	cout << "scores resized for " << visual_repr_1_.getSegments() << endl;
+	//cout << "scores resized for " << visual_repr_1_.getSegments() << endl;
 	structural_scores_.resize(visual_repr_1_.getSegments());
 	appearance_scores_.resize(visual_repr_1_.getSegments());
 	for (int index = 0; index < visual_repr_1_.getSegments(); index++) {
@@ -337,9 +337,9 @@ void GraphsMatch::find_match() {
 				max = score;
 				max_index_v2 = j;
 			}
-			if( i == 21){
-				cout <<" Node U1: "<<i<<" V2:"<<j<<  " appearance score="<<appearance_scores_[i][j]<<" structural_score="<<structural_scores_[i][j] <<endl;
-			}
+//			if( i == 21){
+//				cout <<" Node U1: "<<i<<" V2:"<<j<<  " appearance score="<<appearance_scores_[i][j]<<" structural_score="<<structural_scores_[i][j] <<endl;
+//			}
 		}
 		visual_repr_1_.getAtoms()[i].atom_ptr->id_matched_to = max_index_v2;
 	}
@@ -372,7 +372,7 @@ void GraphsMatch::getMats(Mat& seg1, Mat& seg2) {
 
 GraphsMatch::~GraphsMatch() {
 	// TODO Auto-generated destructor stub
-	cout <<" ~GraphsMatch()"<<endl;
+
 }
 
 } /* namespace imgseg */

@@ -20,7 +20,7 @@ VisualRepresentation::VisualRepresentation() {
 VisualRepresentation::VisualRepresentation(vector<std::shared_ptr<Atom> >& atoms, std::string prefix):
 		segments(atoms.size()){
 
-	cout <<"VisualRepresentation::VisualRepresentation(vector<AtomRef>& atoms, std::string prefix)"<<this <<endl;
+	//cout <<"VisualRepresentation::VisualRepresentation(vector<AtomRef>& atoms, std::string prefix)"<<this <<endl;
 	vector<MyUniqueAtomGraph::Vertex> vertices(atoms.size());
 	for (std::shared_ptr<Atom>& atom : atoms) {
 		AtomRef atom_ref;
@@ -58,7 +58,7 @@ VisualRepresentation::VisualRepresentation(vector<std::shared_ptr<Atom> >& atoms
 	//iterate_nodes();
 	//iterate_edges();
 	Visualisation vis;
-	cout <<"prefix="<<prefix<<endl;
+	//cout <<"prefix="<<prefix<<endl;
 	vis.write_gv_file(g_,prefix,prefix);
 
 

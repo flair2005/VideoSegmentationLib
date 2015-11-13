@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project (VisualRepresentation)
 
 #set(OpenCV_DIR "~/workspace/opencv/build")
-find_package( OpenCV 2.4 REQUIRED)
+find_package( OpenCV 2.4 REQUIRED   ml core gpu highgui)
 set(PCL_DIR "~/workspace/pcl/build/")
 find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
@@ -42,11 +42,13 @@ include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_BINARY_DIR}")
 
 # Create a shared library
-add_library(VR_LIBRARY
+add_library(VR_LIBRARY SHARED
+${PROJECT_SOURCE_DIR}/VideoSegmentation.cpp
 ${PROJECT_SOURCE_DIR}/GraphsMatch.cpp
 ${PROJECT_SOURCE_DIR}/visual_representation.cpp
 ${PROJECT_SOURCE_DIR}/atom.cpp
 ${PROJECT_SOURCE_DIR}/visualisation.cpp
+${PROJECT_SOURCE_DIR}/hungarian/hungarian.c
 )
 
 
@@ -58,6 +60,9 @@ target_link_libraries (compare VR_LIBRARY  ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GV
 
 add_executable (track src/track_sequence.cpp)
 target_link_libraries (track VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable (testinterface src/testinterface.cpp)
+target_link_libraries (testinterface VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 
 #Continue with subdirectory
