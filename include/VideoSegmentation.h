@@ -31,6 +31,8 @@ public:
 	Segment* get_segment_at(int row, int col);
 	vector<Segment*> get_segments();
 
+	void get_segments(Rect& object_rect, vector<Segment*>& output_segments);
+
 private:
 	int scale_for_propagation_ = 2;
 	int starting_scale_ = 2;
@@ -43,6 +45,8 @@ private:
 	VisualRepresentation *representation_1,*representation_2;
 
 	string prefix_1_, prefix_2_;
+
+	bool rect_contained(const Rect& rect1,const Rect& rect2);
 
 };
 
