@@ -81,9 +81,13 @@ double GraphsMatch::solve_assignment(vector<int>& adj_vector_u1,
 		vector<int>& adj_vector_v2) {
 	hungarian_problem_t p;
 
+	if(adj_vector_u1.size() == 0 || adj_vector_v2.size()== 0)
+		return p_structural_err;
 	int **cost_matrix = new int*[adj_vector_u1.size()];
+
 	for (unsigned int i = 0; i < adj_vector_u1.size(); i++)
 		cost_matrix[i] = new int[adj_vector_v2.size()];
+//	int cost_matrix[500][500];
 
 	for (unsigned int i = 0; i < adj_vector_u1.size(); i++) {
 		for (unsigned int j = 0; j < adj_vector_v2.size(); j++) {

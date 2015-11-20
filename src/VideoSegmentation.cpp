@@ -54,6 +54,33 @@ Segment* VideoSegmentation::get_segment_at(int row, int col) {
 		return segmentation_1->get_segment_at_fast(row, col);
 }
 
+Segment* VideoSegmentation::get_segment_by_label(const Vec3b& label){
+	if (segmentation_2 != nullptr){
+		//cout <<">VideoSegmentation::get_segment_by_label finding matches in segmentation_2"<<endl;
+		for(Segment* seg: segmentation_2->getSegmentsPyramid()[scale_for_propagation_]){
+			//cout <<" is label="<<seg->getLabel()<<" == "<<label<<" ?"<<endl;
+			if(seg->getLabel() == label){
+				//cout <<"found segment with label="<<label<<endl;
+				return seg;
+			}
+
+		}
+		return nullptr;
+	}
+	else{
+
+		for(Segment* seg: segmentation_1->getSegmentsPyramid()[scale_for_propagation_]){
+			if(seg->getLabel() == label){
+				//cout <<"found segment with label="<<label<<endl;
+				return seg;
+			}
+
+		}
+		return nullptr;
+
+	}
+}
+
 vector<Segment*> VideoSegmentation::get_segments() {
 	if (segmentation_2 == nullptr)
 		return segmentation_1->getSegmentsPyramid()[scale_for_propagation_];
@@ -62,7 +89,8 @@ vector<Segment*> VideoSegmentation::get_segments() {
 }
 
 bool VideoSegmentation::rect_contained(const Rect& rect1,const Rect& rect2) {
-	return ((rect1.x >= rect2.x) && (rect1.y >= rect1.y)
+
+	return ((rect1.x >= rect2.x) && (rect1.y >= rect2.y)
 			&& (rect1.x + rect1.width < rect2.x + rect2.width)
 			&& (rect1.y + rect1.height < rect2.y + rect2.height));
 }
@@ -82,9 +110,14 @@ void VideoSegmentation::get_segments(Rect& object_rect,
 		const vector<Segment*>& all_segments =
 				segmentation_2->getSegmentsPyramid()[scale_for_propagation_];
 		for (Segment *seg : all_segments) {
+			//the rectangles dont belong to the same level of the pyramid!!!!
 			const Rect& candidate_rect = seg->getBoundRect();
-			if (rect_contained(candidate_rect, object_rect))
+			if (rect_contained(candidate_rect, object_rect)){
+				cout << candidate_rect << " contained in "<<object_rect<<endl;
 				output_segments.push_back(seg);
+			}
+			else
+				cout << candidate_rect << " NOT contained in "<<object_rect<<endl;
 		}
 
 	}

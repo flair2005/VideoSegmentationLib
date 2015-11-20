@@ -31,6 +31,9 @@ public:
 	Segment* get_segment_at(int row, int col);
 	vector<Segment*> get_segments();
 
+	//get a segment by its label
+	Segment* get_segment_by_label(const Vec3b& label);
+
 	void get_segments(Rect& object_rect, vector<Segment*>& output_segments);
 
 private:

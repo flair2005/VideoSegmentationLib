@@ -69,8 +69,15 @@ int hungarian_imax(int a, int b) {
   return (a<b)?b:a;
 }
 
-int hungarian_init(hungarian_problem_t* p, int** cost_matrix, int rows, int cols, int mode) {
-
+//int hungarian_init(hungarian_problem_t* p, int** cost_matrix, int rows, int cols, int mode) {
+//template <size_t rows_, size_t cols_>
+int hungarian_init(hungarian_problem_t* p,
+		   int** cost_matrix,
+		   //int (&cost_matrix)[SIZE][SIZE],
+		   //int (&cost_matrix)[SIZE][SIZE],
+		   int rows,
+		   int cols,
+		   int mode) {
   int i,j, org_cols, org_rows;
   int max_cost;
   max_cost = 0;

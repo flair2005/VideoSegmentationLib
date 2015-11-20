@@ -58,7 +58,8 @@ private:
 
 	double structural_similarity(vector<int>& ids_g1,vector<int>& ids_g2);
 
-	const int p_err = 0.5;
+	const double p_err = 0.5;
+	const double p_structural_err = 0.1;
 
 
 

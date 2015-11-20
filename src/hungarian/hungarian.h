@@ -36,6 +36,7 @@ extern "C" {
 #define HUNGARIAN_MODE_MINIMIZE_COST   0
 #define HUNGARIAN_MODE_MAXIMIZE_UTIL 1
 
+#define SIZE 500
 
 typedef struct {
   int num_rows;
@@ -44,11 +45,15 @@ typedef struct {
   int** assignment;  
 } hungarian_problem_t;
 
+
+
 /** This method initialize the hungarian_problem structure and init 
  *  the  cost matrices (missing lines or columns are filled with 0).
  *  It returns the size of the quadratic(!) assignment matrix. **/
+//template <size_t rows_, size_t cols_>
 int hungarian_init(hungarian_problem_t* p, 
 		   int** cost_matrix,
+		//int (&cost_matrix)[SIZE][SIZE],
 		   int rows, 
 		   int cols, 
 		   int mode);
