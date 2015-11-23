@@ -147,8 +147,12 @@ void VisualRepresentation::iterate_edges() {
 bool VisualRepresentation::attached_to(std::shared_ptr<Atom> atom1, std::shared_ptr<Atom> atom2) {
 
 	Mat intersection;
-	const Mat& seg1_mat = atom1->segment_->getBinaryMat();
-	const Mat& seg2_mat = atom2->segment_->getBinaryMat();
+//	const Mat& seg1_mat = atom1->segment_->getBinaryMat();
+//	const Mat& seg2_mat = atom2->segment_->getBinaryMat();
+	Mat seg1_mat = atom1->segment_->getBinaryMat().clone();
+	Mat seg2_mat = atom2->segment_->getBinaryMat().clone();
+	cv::dilate(seg1_mat,seg1_mat,1);
+	cv::dilate(seg2_mat,seg2_mat,1);
 
 	cv::bitwise_and(seg1_mat, seg2_mat, intersection);
 

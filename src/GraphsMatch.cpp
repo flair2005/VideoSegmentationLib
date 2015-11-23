@@ -81,12 +81,13 @@ double GraphsMatch::solve_assignment(vector<int>& adj_vector_u1,
 		vector<int>& adj_vector_v2) {
 	hungarian_problem_t p;
 
+	unsigned int cost_size = 50;//adj_vector_u1.size();
 	if(adj_vector_u1.size() == 0 || adj_vector_v2.size()== 0)
 		return p_structural_err;
-	int **cost_matrix = new int*[adj_vector_u1.size()];
+	int **cost_matrix = new int*[cost_size];
 
-	for (unsigned int i = 0; i < adj_vector_u1.size(); i++)
-		cost_matrix[i] = new int[adj_vector_v2.size()];
+	for (unsigned int i = 0; i < cost_size; i++)
+		cost_matrix[i] = new int[cost_size];
 //	int cost_matrix[500][500];
 
 	for (unsigned int i = 0; i < adj_vector_u1.size(); i++) {
@@ -131,9 +132,11 @@ double GraphsMatch::solve_assignment(vector<int>& adj_vector_u1,
 	else
 		total_cost /= adj_vector_u1.size();
 
-	for (unsigned int i = 0; i < adj_vector_u1.size(); i++)
-		delete cost_matrix[i];
-	delete cost_matrix;
+	for (unsigned int i = 0; i < cost_size; i++){
+		//cout <<"deleting "<<i <<" out of "<<(int)cost_size<<endl;
+		delete [] cost_matrix[i];
+	}
+	delete [] cost_matrix;
 	hungarian_free(&p);
 
 	return  total_cost;

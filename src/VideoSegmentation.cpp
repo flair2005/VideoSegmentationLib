@@ -132,6 +132,7 @@ void VideoSegmentation::addImage(Mat& src, Mat& dst) {
 	if (representation_1 == nullptr) {
 		segmentation_1 = new Segmentation(src, gpu_, scales_, starting_scale_);
 		segmentation_1->segment_pyramid(threshold_);
+		segmentation_1->map_segments(scale_for_propagation_);
 
 		const vector<Segment*>& segments_1 =
 				segmentation_1->getSegmentsPyramid()[scale_for_propagation_];
@@ -152,6 +153,7 @@ void VideoSegmentation::addImage(Mat& src, Mat& dst) {
 
 		segmentation_2 = new Segmentation(src, gpu_, scales_, starting_scale_);
 		segmentation_2->segment_pyramid(threshold_);
+		segmentation_2->map_segments(scale_for_propagation_);
 
 		const vector<Segment*>& segments_2 =
 				segmentation_2->getSegmentsPyramid()[scale_for_propagation_];

@@ -41,7 +41,7 @@ using namespace videoseg;
 Rect object_rect;
 
 const string WINDOW_INTERACT = "Train Object Detector";
-bool drag, drop, object_selected_ = true, select_bg_segments =false;
+bool drag, drop, object_selected_, select_bg_segments =false;
 Mat display, tmp;
 
 vector<Segment*> initial_bg_segments(0), bg_segments(0);
@@ -51,6 +51,12 @@ int segment_class = 1; //Foreground
 int start_training = 0; //1 = starts training
 
 VideoSegmentation videoSegmenter;
+
+int current_frame =0;
+
+//a vector of training examples
+vector<TrainingExample> fg_training_examples,bg_training_examples;
+string seq_name;
 
 static void doMouseCallback(int event, int x, int y, int flags, void* param) {
 	if(segment_class == 1){
@@ -105,16 +111,21 @@ static void doMouseCallback(int event, int x, int y, int flags, void* param) {
 		if( event == CV_EVENT_LBUTTONDOWN){
 			Segment* seg=videoSegmenter.get_segment_at(y,x);
 
-			initial_fg_segments.push_back(new Segment(*seg));
+			TrainingExample example(seg->getCenter(),current_frame,seq_name,*seg);
+			fg_training_examples.push_back(example);
+			imshow("fg segment",seg->getRandomColourMat());
+			waitKey(1);
+
 
 		}
 	}
 	else if (segment_class == 0){
 		if( event == CV_EVENT_LBUTTONDOWN){
 			Segment* seg=videoSegmenter.get_segment_at(y,x);
-			initial_bg_segments.push_back(new Segment(*seg));
-			imshow("segment",seg->getRandomColourMat());
-			waitKey(0);
+			TrainingExample example(seg->getCenter(),current_frame,seq_name,*seg);
+			bg_training_examples.push_back(example);
+			imshow("bg segment",seg->getRandomColourMat());
+			waitKey(1);
 		}
 
 
@@ -156,36 +167,25 @@ void show_segments(string& text,vector<Segment>& segs){
 	waitKey(1);
 }
 
-void user_interaction_select_object(Mat& outputMat, ObjectDetector& slc){
+void user_interaction_select_object(Mat& outputMat){
 	display = outputMat.clone();
 	tmp = display.clone();
 	imshow(WINDOW_INTERACT, display);
-	waitKey(0);
-	if(object_selected_){
 
-//		vector<Segment*>tmp_segments;
-//		videoSegmenter.get_segments(object_rect, tmp_segments);
-//		for(Segment*seg:tmp_segments)
-//			initial_fg_segments.push_back(*seg);
-		cout <<">output_segments.size()="<<initial_fg_segments.size()<<endl;
-		string text = "segments";
-		show_segments(text,initial_fg_segments);
+	int cmd = 0;
+	while( (cmd = waitKey(0)) != 1048608);
+	cout <<"fg_training_examples.size()="<<fg_training_examples.size()<<endl;
+	cout <<"bg_training_examples.size()="<<bg_training_examples.size()<<endl;
+//
+//
+//	cout <<">output_segments.size()="<<initial_fg_segments.size()<<endl;
+//	string text = "segments";
+//	show_segments(text,initial_fg_segments);
 
-	}
+
 }
 
-void propagate_segments(vector<Segment*>& initial_segments,vector<Segment*>& propagated_segments){
-	for(Segment* initial_seg : initial_segments){
-		Segment* propagated = videoSegmenter.get_segment_by_label(initial_seg->getLabel());
-		if(propagated ==nullptr)
-			cout <<"propagated segment is null, no match found for label:"<<initial_seg->getLabel()<<endl;
-		else{
 
-			propagated_segments.push_back(propagated);
-		}
-
-	}
-}
 
 int main(int argc, char** argv) {
 
@@ -196,17 +196,18 @@ int main(int argc, char** argv) {
 	int scales = 3;
 	int gpu = 0;
 	double threshold = 0.01; //0.05;
-	unsigned int starting_frame = 90;
+	unsigned int starting_frame = 0;
+	unsigned int frame_interval = 30;
 	string input_img_path, output_path;
-	string svm_model_path ;
+	string examples_path ;
 	utils.parse_args(argc, argv, threshold, scales, starting_scale,
-			scale_for_propagation, gpu, input_img_path, output_path,svm_model_path);
+			scale_for_propagation, gpu, input_img_path, output_path,examples_path);
 
 
 	videoSegmenter.init(scale_for_propagation, starting_scale, scales,
 			gpu, threshold);
 
-	ObjectDetector slc(ObjectDetector::TRAIN_MODE,svm_model_path);
+
 
 	//add mouse callback function for specifying the rectangular region
 	cv::namedWindow(WINDOW_INTERACT,CV_WINDOW_AUTOSIZE);
@@ -241,8 +242,9 @@ int main(int argc, char** argv) {
 
 
 
-	for (unsigned int i = starting_frame; i < images; i++) {
+	for (unsigned int i = starting_frame; i < images; i+=frame_interval) {
 
+		current_frame = i;
 		cv::Mat img, outputMat,  contours_mat, gradient, grayGradient;
 
 		cout << images_list[i] <<  endl;
@@ -258,57 +260,16 @@ int main(int argc, char** argv) {
 		imshow("video segmentation",outputMat);
 
 
-		//if it is the first image
-		if (i == starting_frame) {
-			user_interaction_select_object(outputMat, slc);
-		}
-		//else need to propagate the labels of the segments
-		else{
 
-			vector<Segment*> propagated_fg_segs, propagated_bg_segs;
-			//propagate the foreground segments
-			propagate_segments(initial_fg_segments,propagated_fg_segs);
-			//propagate the background segments
-			propagate_segments(initial_bg_segments,propagated_bg_segs);
-			//if the succesfully propagated segments are not the same we had in the model
+		user_interaction_select_object(outputMat);
 
-			// ask the user for interaction
-			if(initial_fg_segments.size() != propagated_fg_segs.size()){
-				initial_fg_segments.clear();
-				user_interaction_select_object(outputMat, slc);
-			}
-
-			//otherwise append the propagated segments to the fg_segments vector
-			else{
-
-				fg_segments.insert( fg_segments.end(), propagated_fg_segs.begin(), propagated_fg_segs.end() );
-				bg_segments.insert( bg_segments.end(), propagated_bg_segs.begin(), propagated_bg_segs.end() );
-				cout <<" fg_segments appended : fg_segments.size()="<<fg_segments.size()
-						<<" bg_segments appended : bg_segments.size()="<<bg_segments.size()<<endl;
-
-			}
-			cout <<" propagated segments="<<propagated_fg_segs.size()<<endl;
-			string text = "fg segments";
-			show_segments(text,propagated_fg_segs);
-			text = "bg segments";
-			show_segments(text,propagated_bg_segs);
-			slc.add_training_data(propagated_fg_segs,propagated_bg_segs);
-
-		}
-		if(start_training)
-		{
-			slc.train();
-			return 0;
-		}
 
 
 
 	}
-	//slc.add_training_data(fg_segments,bg_segments);
-	slc.train();
 
-//
-//	vector<cv::Mat> outputPyr = segmentation.getOutputSegmentsPyramid();
+
+
 	return 0;
 }
 
