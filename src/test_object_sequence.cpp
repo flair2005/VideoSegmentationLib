@@ -44,10 +44,10 @@ int main(int argc, char** argv) {
 	int scales = 3;
 	int gpu = 0;
 	double threshold = 0.01; //0.05;
-	unsigned int starting_frame = 190;
-	string input_img_path, output_path, svm_path;
+	unsigned int starting_frame = 0;
+	string input_img_path, output_path, svm_path,input_clouds_path;
 	utils.parse_args(argc, argv, threshold, scales, starting_scale,
-			scale_for_propagation, gpu, input_img_path, output_path,svm_path);
+			scale_for_propagation, gpu, input_img_path, output_path,svm_path,input_clouds_path);
 	cout <<"svm_path="<<svm_path<<endl;
 	ObjectDetector slc(ObjectDetector::TEST_MODE,svm_path);
 
@@ -96,9 +96,11 @@ int main(int argc, char** argv) {
 		Mat detections = Mat::zeros(ref.rows,ref.cols,CV_8UC3);
 		for(Segment *seg : current_segs){
 
-			if(seg->getClassLabel() > 0.5)
+			if(seg->getClassLabel() > 0.3)
 				detections(seg->getBoundRect()) += seg->getRandomColourMat();
 		}
+		imshow("img",img_1);
+		imshow("segmentation",ref);
 		imshow("prediction",detections);
 		waitKey(1);
 
