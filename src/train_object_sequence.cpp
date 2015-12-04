@@ -47,12 +47,12 @@ const string WINDOW_INTERACT = "Train Object Detector";
 bool drag, drop, object_selected_ = true, select_bg_segments = false;
 Mat display, tmp;
 
-vector<Segment*> initial_bg_segments(0), bg_segments(0);
+vector<Segment*> all_segments(0),initial_bg_segments(0), bg_segments(0);
 vector<Segment*> initial_fg_segments(0), fg_segments(0);
 //the class selected
 int segment_class = 1; //Foreground
 int start_training = 0; //1 = starts training
-int re_configure = 0;
+int re_configure = 1;
 
 VideoSegmentation videoSegmenter;
 
@@ -62,15 +62,26 @@ static void doMouseCallback(int event, int x, int y, int flags, void* param) {
 		if (event == CV_EVENT_LBUTTONDOWN) {
 			Segment* seg = videoSegmenter.get_segment_at(y, x);
 
-			initial_fg_segments.push_back(new Segment(*seg));
+			if(seg != nullptr){
+				initial_fg_segments.push_back(new Segment(*seg));
+				//remove this one from all_segments
+				all_segments.erase(std::remove(all_segments.begin(), all_segments.end(), seg), all_segments.end());
+				imshow("segment", seg->getRandomColourMat());
+				waitKey(5);
+			}
+
 
 		}
 	} else if (segment_class == 0) {
 		if (event == CV_EVENT_LBUTTONDOWN) {
 			Segment* seg = videoSegmenter.get_segment_at(y, x);
-			initial_bg_segments.push_back(new Segment(*seg));
-			imshow("segment", seg->getRandomColourMat());
-			waitKey(0);
+			if(seg != nullptr){
+				initial_bg_segments.push_back(new Segment(*seg));
+				imshow("segment", seg->getRandomColourMat());
+				waitKey(5);
+
+			}
+
 		}
 
 	}
@@ -116,6 +127,7 @@ void user_interaction_select_object(Mat& outputMat, ObjectDetector& slc) {
 	tmp = display.clone();
 	imshow(WINDOW_INTERACT, display);
 	waitKey(0);
+	initial_bg_segments=all_segments;
 	if (object_selected_) {
 
 //		vector<Segment*>tmp_segments;
@@ -147,7 +159,7 @@ void propagate_segments(vector<Segment*>& initial_segments,
 	}
 }
 
-void cropped_pcl_from_segments(Mat& img, Mat& depth,vector<Segment*>&segments,pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud,Mat& cropped_img,Mat& cropped_depth){
+void cropped_pcl_from_segments(Mat& img, Mat& depth,vector<Segment*>&segments,pcl::PointCloud<pcl::PointXYZRGB>::Ptr& cloud,Mat& tmp_img,Mat& tmp_depth){
 
 	Size size_segments = segments[0]->getBinaryMat().size();
 	cout <<" target size="<<size_segments<<endl;
@@ -156,8 +168,9 @@ void cropped_pcl_from_segments(Mat& img, Mat& depth,vector<Segment*>&segments,pc
 //	pyrDown(depth,depth2,cv::Size(img.cols / 2, img.rows / 2));
 
 	//depth2 *= 0.001;
-	Mat tmp_img = Mat::zeros(img.rows, img.cols, CV_8UC3);
-	Mat tmp_depth = Mat::zeros(img.rows, img.cols, CV_32FC1);
+	Mat cropped_img,cropped_depth;
+	tmp_img = Mat::zeros(img.rows, img.cols, CV_8UC3);
+	tmp_depth = Mat::zeros(img.rows, img.cols, CV_32FC1);
 
 	Mat mask = Mat::zeros(size_segments, CV_8UC1);
 	for (Segment * seg : initial_fg_segments) {
@@ -189,20 +202,44 @@ void cropped_pcl_from_segments(Mat& img, Mat& depth,vector<Segment*>&segments,pc
 	Utils utils;
 	cropped_img = tmp_img(minRect);
 	cropped_depth = tmp_depth(minRect);
-	imshow("mask", mask);
-	imshow("cropped_img", cropped_img);
-	waitKey(0);
+	//imshow("mask", mask);
+	//imshow("cropped_img", cropped_img);
+	//waitKey(0);
 	int cx = img.cols/2;
 	int cy = img.rows/2;
 	utils.image_to_pcl(cropped_img,cropped_depth , cloud,cx,cy,minRect);
-	pcl::visualization::PCLVisualizer viewer("3d Viewer");
-	viewer.setBackgroundColor(0, 0, 0);
-	viewer.addPointCloud < pcl::PointXYZRGB > (cloud, "sample cloud");
-	//viewer.addCoordinateSystem(0.0);
-	viewer.spin();
+//	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pruned_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+//	utils.prune_pcl(cloud, pruned_cloud);
+//	cout <<"original cloud ->points.size()="<<cloud->points.size()<<endl;
+//	cout <<"pruned_cloud->points.size()="<<pruned_cloud->points.size()<<endl;
+//	pcl::visualization::PCLVisualizer viewer("3d Viewer");
+//	viewer.setBackgroundColor(0, 0, 0);
+//	viewer.addPointCloud < pcl::PointXYZRGB > (pruned_cloud, "sample cloud");
+//	viewer.spin();
 }
 
 
+
+void add_selected_segments(Mat&img, Mat& depth_float,vector<Segment*>& fg_segments,vector<Segment*>& bg_segments, ObjectDetector& slc){
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+	pcl::PointCloud<pcl::Normal>::Ptr normals;
+
+	Utils utils;
+	utils.image_to_pcl(img,depth_float,pcl_cloud);
+	utils.compute_integral_normals(pcl_cloud, normals);
+
+
+	for(Segment* seg: fg_segments){
+		seg->add_precomputed_pcl(pcl_cloud, normals);
+		seg->computeFeatures();
+	}
+	for(Segment* seg: bg_segments){
+		seg->add_precomputed_pcl(pcl_cloud, normals);
+		seg->computeFeatures();
+	}
+
+	slc.add_training_data(fg_segments, bg_segments,pcl_cloud,img,depth_float);
+}
 
 int main(int argc, char** argv) {
 
@@ -263,32 +300,27 @@ int main(int argc, char** argv) {
 
 	for (unsigned int i = starting_frame; i < images; i++) {
 
-		cv::Mat img, depth, outputMat, contours_mat, gradient, grayGradient;
+		cv::Mat img, depth, depth_float, outputMat, contours_mat, gradient, grayGradient;
 
 		cout << images_list[i] << endl;
 
 		img = cv::imread(images_list[i], -1);
 		cout << "> opening depth map: " << clouds_list[i] << endl;
-		//depth = cv::imread(clouds_list[i], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
-		cv::FileStorage fs2(clouds_list[i], FileStorage::READ);
-		fs2["depthMat"] >> depth;
+		depth = cv::imread(clouds_list[i], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+		depth.convertTo(depth_float,CV_32FC1);
+		depth_float *= 0.001f;
+
 		cout <<" depth.type()="<<depth.type()<<endl;
 
-//		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-//		utils.image_to_pcl(img,depth , cloud);
-//		pcl::visualization::PCLVisualizer viewer("3d Viewer");
-//		viewer.setBackgroundColor(0, 0, 0);
-//		viewer.addPointCloud < pcl::PointXYZRGB > (cloud, "sample cloud");
-//		//viewer.addCoordinateSystem(0.0);
-//		viewer.spin();
+
 
 
 		string prefix_1 = utils.get_file_name(images_list[i]);
 		prefix_1 = utils.remove_extension(prefix_1);
 
-		imshow("img",img);
-		//waitKey(0);
+
 		videoSegmenter.addImage(img, outputMat);
+		all_segments = videoSegmenter.get_segments();
 		cout <<"videoSegmenter added"<<endl;
 		imshow("video segmentation", outputMat);
 		waitKey(1);
@@ -296,22 +328,45 @@ int main(int argc, char** argv) {
 		//if it is the first image
 		if (i == starting_frame) {
 			user_interaction_select_object(outputMat, slc);
+			add_selected_segments(img,depth_float,initial_fg_segments,initial_bg_segments,slc);
 			//display the cropped point cloud
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-			Mat cropped_img;
-			Mat cropped_depth;
-			cropped_pcl_from_segments(img,depth,initial_fg_segments,cloud,cropped_img,cropped_depth);
-			slc.add_training_data(initial_fg_segments, initial_bg_segments,cloud,cropped_img,cropped_depth);
+//			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+//			Mat cropped_img;
+//			Mat cropped_depth;
+//			for(Segment* seg: initial_fg_segments){
+//				seg->addPcl(img,depth_float);
+//				seg->computeFeatures();
+//			}
+//			for(Segment* seg: initial_bg_segments){
+//				seg->addPcl(img,depth_float);
+//				seg->computeFeatures();
+//			}
+//
+//
+//			cropped_pcl_from_segments(img,depth,initial_fg_segments,cloud,cropped_img,cropped_depth);
+//			slc.add_training_data(initial_fg_segments, initial_bg_segments,cloud,cropped_img,cropped_depth);
+
+
 
 
 		} else if (re_configure) {
 			user_interaction_select_object(outputMat, slc);
+			add_selected_segments(img,depth_float,initial_fg_segments,initial_bg_segments,slc);
 			//display the cropped point cloud
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-			Mat cropped_img;
-			Mat cropped_depth;
-			cropped_pcl_from_segments(img,depth,initial_fg_segments,cloud,cropped_img,cropped_depth);
-			slc.add_training_data(initial_fg_segments, initial_bg_segments,cloud,cropped_img,cropped_depth);
+
+//			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+//			Mat cropped_img;
+//			Mat cropped_depth;
+//			for(Segment* seg: initial_fg_segments){
+//				seg->addPcl(img,depth_float);
+//				seg->computeFeatures();
+//			}
+//			for(Segment* seg: initial_bg_segments){
+//				seg->addPcl(img,depth_float);
+//				seg->computeFeatures();
+//			}
+//			cropped_pcl_from_segments(img,depth,initial_fg_segments,cloud,cropped_img,cropped_depth);
+//			slc.add_training_data(initial_fg_segments, initial_bg_segments,cloud,cropped_img,cropped_depth);
 		}
 		//else need to propagate the labels of the segments
 		else {
@@ -326,13 +381,30 @@ int main(int argc, char** argv) {
 			// ask the user for interaction
 			if (initial_fg_segments.size() != propagated_fg_segs.size()) {
 				initial_fg_segments.clear();
+				initial_bg_segments.clear();
 				user_interaction_select_object(outputMat, slc);
+				add_selected_segments(img,depth_float,initial_fg_segments,initial_bg_segments,slc);
 				//display the cropped point cloud
-				pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-				Mat cropped_img;
-				Mat cropped_depth;
-				cropped_pcl_from_segments(img,depth,initial_fg_segments,cloud,cropped_img,cropped_depth);
-				slc.add_training_data(initial_fg_segments, initial_bg_segments,cloud,cropped_img,cropped_depth);
+//				pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+//				Mat cropped_img;
+//				Mat cropped_depth;
+//				for(Segment* seg: initial_fg_segments){
+//					seg->addPcl(img,depth_float);
+//					seg->computeFeatures();
+//				}
+//				for(Segment* seg: initial_bg_segments){
+//					seg->addPcl(img,depth_float);
+//					seg->computeFeatures();
+//				}
+//				cropped_pcl_from_segments(img,depth,initial_fg_segments,cloud,cropped_img,cropped_depth);
+//				slc.add_training_data(initial_fg_segments, initial_bg_segments,cloud,cropped_img,cropped_depth);
+
+//				pcl::visualization::PCLVisualizer viewer("3d Viewer");
+//								viewer.setBackgroundColor(0, 0, 0);
+//								viewer.addPointCloud < pcl::PointXYZRGB > (cloud, "sample cloud");
+//								//viewer.addCoordinateSystem(0.0);
+//								viewer.spin();
+
 			}
 
 			//otherwise append the propagated segments to the fg_segments vector
@@ -347,6 +419,23 @@ int main(int argc, char** argv) {
 						<< " bg_segments appended : bg_segments.size()="
 						<< bg_segments.size() << endl;
 
+				add_selected_segments(img,depth_float,propagated_fg_segs,propagated_bg_segs,slc);
+				//display the cropped point cloud
+//				pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+//				Mat cropped_img;
+//				Mat cropped_depth;
+//
+//				for(Segment* seg: propagated_fg_segs){
+//					seg->addPcl(img,depth_float);
+//					seg->computeFeatures();
+//				}
+//				for(Segment* seg: propagated_bg_segs){
+//					seg->addPcl(img,depth_float);
+//					seg->computeFeatures();
+//				}
+//				cropped_pcl_from_segments(img,depth,propagated_fg_segs,cloud,cropped_img,cropped_depth);
+//				slc.add_training_data(propagated_fg_segs, propagated_bg_segs,cloud,cropped_img,cropped_depth);
+
 			}
 			cout << " propagated segments=" << propagated_fg_segs.size()
 					<< endl;
@@ -355,25 +444,20 @@ int main(int argc, char** argv) {
 			text = "bg segments";
 			show_segments(text, propagated_bg_segs);
 
-			//slc.add_training_data(propagated_fg_segs, propagated_bg_segs);
-			//display the cropped point cloud
-			pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-			Mat cropped_img;
-			Mat cropped_depth;
-			cropped_pcl_from_segments(img,depth,propagated_fg_segs,cloud,cropped_img,cropped_depth);
-			slc.add_training_data(propagated_fg_segs, propagated_bg_segs,cloud,cropped_img,cropped_depth);
-			cout <<">aligning first two point clouds"<<endl;
-			slc.align_point_clouds();
-			slc.run_kinfu(0.3);
+
+
+
 
 		}
 		if (start_training) {
+			//slc.run_kinfu(1.5);
 			slc.train();
 			return 0;
 		}
 
 	}
 	//slc.add_training_data(fg_segments,bg_segments);
+	//slc.run_kinfu(1.5);
 	slc.train();
 
 //

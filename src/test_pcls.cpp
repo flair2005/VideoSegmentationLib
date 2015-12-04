@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 	int scales = 3;
 	int gpu = 0;
 	double threshold = 0.01; //0.05;
-	unsigned int starting_frame = 0;
+	unsigned int starting_frame = 15;
 	string input_img_path, output_path, svm_path,input_clouds_path;
 
 	std::vector<std::string> clouds_list;
@@ -66,8 +66,6 @@ int main(int argc, char** argv) {
 		std::string content_clouds((std::istreambuf_iterator<char>(file_pcls)),
 				std::istreambuf_iterator<char>());
 		boost::split(clouds_list, content_clouds, boost::is_any_of("\t \n"));
-
-	ObjectDetector slc(ObjectDetector::TEST_MODE,svm_path);
 
 
 
@@ -94,68 +92,48 @@ int main(int argc, char** argv) {
 
 		cv::Mat img_1, img_2,depth, depth_float, contours_mat, gradient, grayGradient;
 
-
+		cout <<"> testing "<<images_list[i]<<endl;
 		img_1 = cv::imread(images_list[i], -1);
 		depth = cv::imread(clouds_list[i], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 		depth.convertTo(depth_float,CV_32FC1);
 		depth_float *= 0.001f;
 
-		string prefix_1 = utils.get_file_name(images_list[i]);
-		prefix_1 = utils.remove_extension(prefix_1);
 
-		/*
-		 * process img_1
-		 */
+
+
+
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+		pcl::PointCloud<pcl::Normal>::Ptr normals;
+		string time_text("image to pcl: ");
+		utils.tick();
+		utils.image_to_pcl(img_1,depth_float,pcl_cloud);
+		utils.tock(time_text);
+		//utils.remove_outliers(pcl_cloud,pcl_cloud);
+		time_text = "time for normal computation";
+		utils.tick();
+		utils.compute_integral_normals(pcl_cloud, normals);
+		utils.tock(time_text);
+		string text("cloud");
+		//utils.compute_normals(pcl_cloud)
+		//utils.display_cloud(pcl_cloud, text);
+
 		Segmentation segmentation_1(img_1, gpu, scales, starting_scale);
 		segmentation_1.segment_pyramid(threshold);
 
 		vector<Segment*> current_segs = segmentation_1.getSegmentsPyramid()[scale_for_propagation];
 		segmentation_1.map_segments(scale_for_propagation);
-		/*
-		 * compute the point cloud
-		 */
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-		pcl::PointCloud<pcl::Normal>::Ptr normals;
-
-		Utils utils;
-		utils.image_to_pcl(img_1,depth_float,pcl_cloud);
-		utils.compute_integral_normals(pcl_cloud, normals);
-
-		Mat mask, debug;
-		vector<Point3d> slc_positions,slc_orientations;
-		bool detected = slc.test_data(current_segs, img_1, depth_float, mask, debug,
-					slc_positions,slc_orientations);
-
-		imshow("detections",debug);
-		imshow("mask",mask);
-		waitKey(50);
+		for(Segment *seg : current_segs){
+			imshow("seg",seg->getBinaryMat());
+			waitKey(0);
+			seg->addPcl(img_1, depth_float);
 
 
-//		for(Segment *seg : current_segs){
-//			seg->add_precomputed_pcl(pcl_cloud, normals);
-//			//seg->addPcl(img_1,depth_float);
-//			seg->computeFeatures();
-//		}
-//		slc.test_data(current_segs);
-//		Mat& ref = segmentation_1.getOutputSegmentsPyramid()[scale_for_propagation];
-//		Mat detections = Mat::zeros(ref.rows,ref.cols,CV_8UC3);
-//		for(Segment *seg : current_segs){
-//
-//			if(seg->getClassLabel() > 0.2){
-//				detections(seg->getBoundRect()) += seg->getRandomColourMat();
-//				cout <<" detection confidence="<<seg->getClassLabel()<<endl;
-//			}
-//		}
-//		Rect rect;
-//		resize(detections,detections,img_1.size());
-//		find_slc_bounding_box(detections, rect);
-//		rectangle(img_1,rect,Scalar(0,0,255),3);
-//
-//
-//		imshow("img",img_1);
-//		imshow("segmentation",ref);
-//		imshow("prediction",detections);
-//		waitKey(50);
+			seg->add_precomputed_pcl(pcl_cloud, normals);
+			//seg->addPcl(img_1, depth_float);
+			seg->computeFeatures();
+		}
+
+
 
 
 	}
