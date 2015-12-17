@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project (VisualRepresentation)
+project (VideoSegmentation)
 
 #set(OpenCV_DIR "~/workspace/opencv/build")
 find_package( OpenCV 2.4 REQUIRED   ml core gpu highgui)
@@ -13,18 +13,10 @@ find_package(Boost REQUIRED graph program_options)
 find_package(GraphViz REQUIRED)
 
 
-
 MESSAGE( STATUS "CMAKE at VisualRepresentation")
 
 
 add_definitions(-Wall -g  -fopenmp -lgomp -march=native -std=c++11 -O4)
-
-#link the Discrete Relaxation Lib
-set(RELAX_LIB_PATH /home/martin/workspace/DiscreteRelaxation)
-ADD_LIBRARY(relaxationLib STATIC IMPORTED)
-SET_TARGET_PROPERTIES(relaxationLib PROPERTIES
-    IMPORTED_LOCATION ${RELAX_LIB_PATH}/build/libSEGMENTATION.a)
-include_directories(${RELAX_LIB_PATH}/src/include)
 
 #link the Segmentation lib
 set(SEG_LIB_PATH /home/martin/workspace/SegmentationLib)
@@ -64,8 +56,19 @@ target_link_libraries (track VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC
 add_executable (testinterface src/testinterface.cpp)
 target_link_libraries (testinterface VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
+add_executable (train_detector src/train_object_sequence.cpp)
+target_link_libraries (train_detector VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable (eff_train_detector src/efficient_train_object_sequence.cpp)
+target_link_libraries (eff_train_detector VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+
+
+add_executable (test_detector src/test_object_sequence.cpp)
+target_link_libraries (test_detector VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable (test_pcls src/test_pcls.cpp)
+target_link_libraries (test_pcls VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+
 
 #Continue with subdirectory
-#add_subdirectory(Compare)
-#add_subdirectory(GUI)
-
+add_subdirectory(GUIMultiThread)

@@ -121,13 +121,15 @@ int main(int argc, char** argv) {
 		utils.image_to_pcl(img_1,depth_float,pcl_cloud);
 		utils.compute_integral_normals(pcl_cloud, normals);
 
-		Mat mask, debug;
+		vector<Mat> masks;
+		Mat debug;
 		vector<Point3d> slc_positions,slc_orientations;
-		bool detected = slc.test_data(current_segs, img_1, depth_float, mask, debug,
+
+		bool detected = slc.test_data(current_segs, img_1, depth_float, masks, debug,
 					slc_positions,slc_orientations);
 
 		imshow("detections",debug);
-		imshow("mask",mask);
+
 		waitKey(50);
 
 
