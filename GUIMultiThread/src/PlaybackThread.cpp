@@ -42,7 +42,7 @@
 
 PlaybackThread::PlaybackThread(SharedImageBuffer *sharedImageBuffer, SegmentationParameters* seg_params) :
     QThread(),
-    m_sharedImageBuffer(sharedImageBuffer), m_seg_params(seg_params)
+    m_sharedImageBuffer(sharedImageBuffer), m_seg_params(seg_params),object_entity(nullptr)
 {
 
 }
@@ -52,6 +52,11 @@ void PlaybackThread::segment(cv::Mat& src,cv::Mat& dst){
     std::cout <<" segmenting with threshold="<<m_seg_params->getThreshold()<<endl;
     segmentation.segment_pyramid(m_seg_params->getThreshold());
     dst = segmentation.getOutputSegmentsPyramid()[scale_for_propagation];
+}
+
+void PlaybackThread::activateTestMode(ObjectEntity* object_entity){
+    test_mode = true;
+    m_object_entity = object_entity;
 }
 
 void PlaybackThread::run()
@@ -71,6 +76,12 @@ void PlaybackThread::run()
         Mat segMat;
         segment(src,segMat);
         m_segmentation = MatToQImage(segMat);
+
+
+        //check if we should test a model
+        if(test_mode){
+            //m_object_entity->m_detector->
+        }
 
         // Inform GUI thread of new frame (QImage)
         emit newFrame(m_frame);

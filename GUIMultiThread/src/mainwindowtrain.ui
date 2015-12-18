@@ -35,7 +35,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>461</width>
+        <width>921</width>
         <height>56</height>
        </rect>
       </property>
@@ -50,6 +50,13 @@
          </property>
          <property name="text">
           <string>Play Sequence</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="testPushButton">
+         <property name="text">
+          <string>Test Model</string>
          </property>
         </widget>
        </item>

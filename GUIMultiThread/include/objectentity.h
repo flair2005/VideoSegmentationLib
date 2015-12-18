@@ -9,7 +9,7 @@ class ObjectEntity
 public:
     ObjectEntity(QString name);
 
-    ObjectEntity(QString name,QString svm_path);
+    ObjectEntity(QString name,QString svm_path, bool train);
 
 
     virtual ~ObjectEntity();

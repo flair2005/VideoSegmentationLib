@@ -49,6 +49,8 @@ private:
     QString object_path;
     QString object_name;
 
+    ObjectEntity* test_object;
+
 //Qt4
 public slots:
     void updateFrame(const QImage &frame);
@@ -70,6 +72,7 @@ private slots:
 
     void on_objectsComboBox_currentIndexChanged(int index);
     void on_saveNewObjectButton_pressed();
+    void on_testPushButton_released();
 };
 
 #endif // MAINWINDOWTRAIN_H

@@ -5,11 +5,14 @@ ObjectEntity::ObjectEntity(QString name):
 {
 }
 
-ObjectEntity::ObjectEntity(QString name,QString svm_path):
+ObjectEntity::ObjectEntity(QString name,QString svm_path, bool train):
     m_name(name),m_svm_path(svm_path)
 {
     std::string svm_model_path = svm_path.toUtf8().constData();
-    m_detector = new ObjectDetector(ObjectDetector::TRAIN_MODE, svm_model_path);
+    if(train)
+        m_detector = new ObjectDetector(ObjectDetector::TRAIN_MODE, svm_model_path);
+    else
+        m_detector = new ObjectDetector(ObjectDetector::TEST_MODE, svm_model_path);
 }
 
 

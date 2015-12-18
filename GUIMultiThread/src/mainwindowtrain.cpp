@@ -13,7 +13,8 @@
 
 MainWindowTrain::MainWindowTrain(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindowTrain)
+    ui(new Ui::MainWindowTrain),
+    test_object(nullptr)
 {
     ui->setupUi(this);
 
@@ -196,10 +197,13 @@ void MainWindowTrain::on_objectsComboBox_currentIndexChanged(int index)
 
         QFileInfo fi(full_path);
         QString folder_name = fi.baseName();
+
         QString file_name = fi.fileName();
 
         ui->objectNameLineEdit->setText(file_name);
         ui->labelPathModel->setText(folder_name);
+
+        test_object = new ObjectEntity(file_name,folder_name,false);
 
 
     }
@@ -216,7 +220,7 @@ void MainWindowTrain::on_saveNewObjectButton_pressed()
 {
     object_name = ui->objectNameLineEdit->text();
 
-    ObjectEntity* object = new ObjectEntity(object_name, object_path);
+    ObjectEntity* object = new ObjectEntity(object_name, object_path,true);
     trained_objects.push_back(object);
     ui->objectsComboBox->addItem(object_name);
 
@@ -226,4 +230,12 @@ void MainWindowTrain::on_saveNewObjectButton_pressed()
     QDir dir = QDir::root();
     dir.mkpath(path);
 
+}
+
+void MainWindowTrain::on_testPushButton_released()
+{
+    //test the loaded model
+    if(!test_object){
+
+    }
 }

@@ -58,6 +58,7 @@ class PlaybackThread : public QThread
         void init();
         void stop();
         void setPath(std::vector<std::string>& imagePaths);
+        void activateTestMode(ObjectEntity* object_entity);
 
         int getInputSourceWidth();
         int getInputSourceHeight();
@@ -98,6 +99,11 @@ signals:
         int scales = 3;
         int gpu = 0;
         double threshold = 0.05; //0.05;
+
+        //test mode
+        bool test_mode = false;
+        ObjectEntity* m_object_entity;
+
 
         void segment(cv::Mat& src,cv::Mat& dst);
 
