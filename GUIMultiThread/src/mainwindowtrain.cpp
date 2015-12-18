@@ -11,7 +11,6 @@
 #include "PlaybackThread.h"
 
 
-
 MainWindowTrain::MainWindowTrain(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindowTrain)
@@ -66,7 +65,10 @@ void MainWindowTrain::open(){
 
 MainWindowTrain::~MainWindowTrain()
 {
-    delete ui;    
+    delete ui;
+    for(auto Object : trained_objects) {
+        delete Object;
+    }
 }
 
 /*
@@ -158,4 +160,70 @@ void MainWindowTrain::on_playPushButton_clicked()
 void MainWindowTrain::on_thresholdDoubleSpinBox_valueChanged(double arg1)
 {
     seg_params.setThreshold(arg1);
+}
+
+void MainWindowTrain::on_comboBox_activated(int index)
+{
+
+
+
+}
+
+void MainWindowTrain::on_openSVMDirButton_pressed()
+{
+    object_path = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                 "/home/martin/bagfiles",
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+
+    ui->labelPathModel->setText(object_path);
+
+}
+
+
+
+void MainWindowTrain::on_objectsComboBox_currentIndexChanged(int index)
+{
+    //new object
+    if(index == 0){
+        ui->labelPathModel->setText(QString(""));
+        ui->objectNameLineEdit->setText(QString(""));
+    }
+    //open object
+    if(index == 1){
+        QString full_path = QFileDialog::getOpenFileName(this,
+                                                               tr("Open XML File 1"), "/home/martin/bagfiles", tr("XML Files (*.xml)"));
+
+        QFileInfo fi(full_path);
+        QString folder_name = fi.baseName();
+        QString file_name = fi.fileName();
+
+        ui->objectNameLineEdit->setText(file_name);
+        ui->labelPathModel->setText(folder_name);
+
+
+    }
+    else{
+        int offset_index = index -2;
+        ui->objectNameLineEdit->setText(trained_objects[offset_index]->m_name);
+        ui->labelPathModel->setText(trained_objects[offset_index]->m_svm_path);
+
+    }
+
+}
+
+void MainWindowTrain::on_saveNewObjectButton_pressed()
+{
+    object_name = ui->objectNameLineEdit->text();
+
+    ObjectEntity* object = new ObjectEntity(object_name, object_path);
+    trained_objects.push_back(object);
+    ui->objectsComboBox->addItem(object_name);
+
+    //create new directory at the path with the name of the object
+    QString path(object_path+"/"+object_name);
+    qDebug() << path;
+    QDir dir = QDir::root();
+    dir.mkpath(path);
+
 }

@@ -6,6 +6,7 @@
 #include <QGraphicsView>
 #include "segmentation.h"
 #include "Parameters.h"
+#include "objectentity.h"
 
 namespace Ui {
 class MainWindowTrain;
@@ -43,6 +44,11 @@ private:
     Segmentation segmentation;
     SegmentationParameters seg_params;
 
+    std::vector<ObjectEntity*> trained_objects;
+    //temporary members for newly created objects
+    QString object_path;
+    QString object_name;
+
 //Qt4
 public slots:
     void updateFrame(const QImage &frame);
@@ -59,6 +65,11 @@ private slots:
     void on_actionOpen_folder_triggered();
     void on_playPushButton_clicked();    
     void on_thresholdDoubleSpinBox_valueChanged(double arg1);
+    void on_comboBox_activated(int index);
+    void on_openSVMDirButton_pressed();
+
+    void on_objectsComboBox_currentIndexChanged(int index);
+    void on_saveNewObjectButton_pressed();
 };
 
 #endif // MAINWINDOWTRAIN_H

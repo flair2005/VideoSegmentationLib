@@ -36,6 +36,7 @@
 #include <QMouseEvent>
 #include <QRect>
 #include <QMenu>
+#include <iostream>
 
 FrameLabel::FrameLabel(QWidget *parent) : 
     QLabel(parent)
@@ -81,6 +82,8 @@ void FrameLabel::mouseReleaseEvent(QMouseEvent *ev)
     // On left mouse button release
     if(ev->button() == Qt::LeftButton)
     {
+
+        std::cout<<"left button pressed at x,y="<<m_box->left()<<" "<<m_box->top()<<std::endl;
         // Set leftButtonRelease flag to TRUE
         m_mouseData.leftButtonRelease = true;
         if (m_drawBox)

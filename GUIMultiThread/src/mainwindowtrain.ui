@@ -129,9 +129,12 @@
        <rect>
         <x>1290</x>
         <y>60</y>
-        <width>451</width>
+        <width>491</width>
         <height>481</height>
        </rect>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSegmentation">
        <attribute name="title">
@@ -174,10 +177,86 @@
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="objectsTab">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Objects</string>
        </attribute>
+       <widget class="QWidget" name="verticalLayoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>9</y>
+          <width>460</width>
+          <height>331</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QComboBox" name="objectsComboBox">
+           <item>
+            <property name="text">
+             <string>* New Object *</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>* Open Object *</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Object Name</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="objectNameLineEdit"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QLabel" name="labelPathModel">
+             <property name="text">
+              <string>Path</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="openSVMDirButton">
+             <property name="text">
+              <string>Choose path</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QPushButton" name="saveNewObjectButton">
+             <property name="text">
+              <string>Save New Object</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton">
+             <property name="text">
+              <string>Train</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </widget>
