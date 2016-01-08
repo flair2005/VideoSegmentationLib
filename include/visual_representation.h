@@ -17,7 +17,7 @@
 #include "atom_graphs.h"
 #include <memory>
 
-using namespace boost;
+//using namespace boost;
 using namespace videoseg;
 using namespace std;
 
@@ -45,15 +45,15 @@ struct AtomRef {
 	std::shared_ptr< Atom > atom_ptr;
 };
 
-typedef Graph<Atom, EdgeProperties> MyAtomGraph;
-typedef Graph< AtomRef , EdgeProperties > MyUniqueAtomGraph;
+typedef boost::Graph<Atom, EdgeProperties> MyAtomGraph;
+typedef boost::Graph< AtomRef , EdgeProperties > MyUniqueAtomGraph;
 
 
 
 struct VertexProperties {
 	int i;
 };
-typedef Graph<VertexProperties, EdgeProperties> MyGraph;
+typedef boost::Graph<VertexProperties, EdgeProperties> MyGraph;
 
 
 

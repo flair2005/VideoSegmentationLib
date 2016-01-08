@@ -20,8 +20,8 @@
 
 
 struct EdgeProperties;
-
-using namespace boost;
+//using namespace boost;
+//using graph = boost::graph;
 
 /* definition of basic boost::graph properties */
 enum vertex_properties_t {
@@ -31,7 +31,11 @@ enum edge_properties_t {
 	edge_properties
 };
 namespace boost {
-BOOST_INSTALL_PROPERTY(vertex, properties);BOOST_INSTALL_PROPERTY(edge, properties);}
+
+BOOST_INSTALL_PROPERTY(vertex, properties);
+BOOST_INSTALL_PROPERTY(edge, properties);}
+
+namespace boost {
 
 /*
  * Class for sorting the edges according to their angle
@@ -71,8 +75,11 @@ public:
 
   size_type size() const { return v.size(); }
 };
+}
 
 struct SlistS {};
+
+
 
 namespace boost {
   template <class ValueType> struct container_gen<SlistS, ValueType>
@@ -101,6 +108,7 @@ namespace boost {
  * END OF Class for sorting the edges according to their angle
  */
 
+namespace boost {
 
 /* the graph base class template */
 template<typename VERTEXPROPERTIES, typename EDGEPROPERTIES>
@@ -241,5 +249,6 @@ public:
 protected:
 	GraphContainer graph;
 };
+}
 
 #endif /* ATOM_GRAPHS_H_ */

@@ -5,6 +5,7 @@
  *      Author: martin
  */
 
+#include "objects/ObjectDetector.h"
 /*
  * SegmentationLib
  */
@@ -25,11 +26,11 @@
 
 #include "atom_graphs.h"
 #include "GraphsMatch.h"
-#include "objects/ObjectDetector.h"
+
 
 #include "utils.h"
 
-using namespace boost;
+
 using namespace videoseg;
 //using namespace std;
 

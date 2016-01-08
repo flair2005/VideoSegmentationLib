@@ -10,6 +10,8 @@
 #include "atom.h"
 #include <memory>
 
+
+
 using namespace boost;
 using namespace videoseg;
 
@@ -88,7 +90,7 @@ vector<Segment*> VideoSegmentation::get_segments() {
 		return segmentation_2->getSegmentsPyramid()[scale_for_propagation_];
 }
 
-bool VideoSegmentation::rect_contained(const Rect& rect1,const Rect& rect2) {
+bool VideoSegmentation::rect_contained(const cv::Rect& rect1,const cv::Rect& rect2) {
 
 	return ((rect1.x >= rect2.x) && (rect1.y >= rect2.y)
 			&& (rect1.x + rect1.width < rect2.x + rect2.width)
@@ -102,7 +104,7 @@ void VideoSegmentation::get_segments(Rect& object_rect,
 		const vector<Segment*>& all_segments =
 				segmentation_1->getSegmentsPyramid()[scale_for_propagation_];
 		for (Segment *seg : all_segments) {
-			const Rect& candidate_rect = seg->getBoundRect();
+			const cv::Rect& candidate_rect = seg->getBoundRect();
 			if (rect_contained(candidate_rect, object_rect))
 				output_segments.push_back(seg);
 		}
@@ -111,7 +113,7 @@ void VideoSegmentation::get_segments(Rect& object_rect,
 				segmentation_2->getSegmentsPyramid()[scale_for_propagation_];
 		for (Segment *seg : all_segments) {
 			//the rectangles dont belong to the same level of the pyramid!!!!
-			const Rect& candidate_rect = seg->getBoundRect();
+			const cv::Rect& candidate_rect = seg->getBoundRect();
 			if (rect_contained(candidate_rect, object_rect)){
 				cout << candidate_rect << " contained in "<<object_rect<<endl;
 				output_segments.push_back(seg);
@@ -124,7 +126,7 @@ void VideoSegmentation::get_segments(Rect& object_rect,
 
 }
 
-void VideoSegmentation::addImage(Mat& src, Mat& dst) {
+void VideoSegmentation::addImage(cv::Mat& src, cv::Mat& dst) {
 
 	/*
 	 * in case we have the first image of the stream
@@ -194,3 +196,4 @@ void VideoSegmentation::addImage(Mat& src, Mat& dst) {
 }
 
 } /* namespace videoseg */
+

@@ -9,6 +9,10 @@
  *      Author: martin
  */
 
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include "objects/ObjectDetector.h"
+
 /*
  * SegmentationLib
  */
@@ -30,14 +34,11 @@
 #include "atom_graphs.h"
 #include "GraphsMatch.h"
 #include "VideoSegmentation.h"
-#include "objects/ObjectDetector.h"
-
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
 
 #include "utils.h"
 
-using namespace boost;
+
+//using namespace boost;
 using namespace videoseg;
 //using namespace std;
 

@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "segmentation.h"
 #include "visual_representation.h"
-using namespace cv;
+//using namespace cv;
 
 namespace videoseg {
 
@@ -25,16 +25,16 @@ public:
 		 double thres);
 	virtual ~VideoSegmentation();
 
-	void addImage(Mat& src, Mat& dst);
+	void addImage(cv::Mat& src, cv::Mat& dst);
 
 	//these two methods interface with the image segmentation
 	Segment* get_segment_at(int row, int col);
 	vector<Segment*> get_segments();
 
 	//get a segment by its label
-	Segment* get_segment_by_label(const Vec3b& label);
+	Segment* get_segment_by_label(const cv::Vec3b& label);
 
-	void get_segments(Rect& object_rect, vector<Segment*>& output_segments);
+	void get_segments(cv::Rect& object_rect, vector<Segment*>& output_segments);
 
 private:
 	int scale_for_propagation_ = 2;
@@ -49,7 +49,7 @@ private:
 
 	string prefix_1_, prefix_2_;
 
-	bool rect_contained(const Rect& rect1,const Rect& rect2);
+	bool rect_contained(const cv::Rect& rect1,const cv::Rect& rect2);
 
 };
 

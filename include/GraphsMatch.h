@@ -14,7 +14,7 @@
 #include "atom_graphs.h"
 
 
-using namespace boost;
+//using namespace boost;
 using namespace videoseg;
 using namespace std;
 
