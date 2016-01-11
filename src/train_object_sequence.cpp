@@ -67,8 +67,8 @@ static void doMouseCallback(int event, int x, int y, int flags, void* param) {
 				initial_fg_segments.push_back(new Segment(*seg));
 				//remove this one from all_segments
 				all_segments.erase(std::remove(all_segments.begin(), all_segments.end(), seg), all_segments.end());
-				imshow("segment", seg->getRandomColourMat());
-				waitKey(5);
+				cv::imshow("segment", seg->getRandomColourMat());
+				cv::waitKey(5);
 			}
 
 
@@ -78,8 +78,8 @@ static void doMouseCallback(int event, int x, int y, int flags, void* param) {
 			Segment* seg = videoSegmenter.get_segment_at(y, x);
 			if(seg != nullptr){
 				initial_bg_segments.push_back(new Segment(*seg));
-				imshow("segment", seg->getRandomColourMat());
-				waitKey(5);
+				cv::imshow("segment", seg->getRandomColourMat());
+				cv::waitKey(5);
 
 			}
 
@@ -105,10 +105,10 @@ void show_segments(string& text, vector<Segment*>& segs) {
 		cout << " debug.size=" << debugMat(seg->getBoundRect()).size()
 				<< " seg.size=" << seg->getRandomColourMat().size() << endl;
 		debugMat(seg->getBoundRect()) += seg->getRandomColourMat();
-		imshow(text, debugMat);
+		cv::imshow(text, debugMat);
 
 	}
-	waitKey(1);
+	cv::waitKey(1);
 }
 
 void show_segments(string& text, vector<Segment>& segs) {
@@ -117,17 +117,17 @@ void show_segments(string& text, vector<Segment>& segs) {
 		cout << " debug.size=" << debugMat(seg.getBoundRect()).size()
 				<< " seg.size=" << seg.getRandomColourMat().size() << endl;
 		debugMat(seg.getBoundRect()) += seg.getRandomColourMat();
-		imshow(text, debugMat);
+		cv::imshow(text, debugMat);
 
 	}
-	waitKey(1);
+	cv::waitKey(1);
 }
 
 void user_interaction_select_object(Mat& outputMat, ObjectDetector& slc) {
 	display = outputMat.clone();
 	tmp = display.clone();
-	imshow(WINDOW_INTERACT, display);
-	waitKey(0);
+	cv::imshow(WINDOW_INTERACT, display);
+	cv::waitKey(0);
 	initial_bg_segments=all_segments;
 	if (object_selected_) {
 
@@ -183,12 +183,12 @@ void cropped_pcl_from_segments(Mat& img, Mat& depth,vector<Segment*>&segments,pc
 		mask += seg->getBinaryMat();
 		//imshow("seg",seg->getMatOriginalColour());
 	}
-	resize(mask,mask,img.size());
+	cv::resize(mask,mask,img.size());
 
 
 	Mat pointsMat;
 	cv::findNonZero(mask,pointsMat);
-	Rect minRect=boundingRect(pointsMat);
+	Rect minRect=cv::boundingRect(pointsMat);
 //	imshow("mask", mask);
 //	imshow("mask cropped", mask(minRect));
 //	waitKey(0);
@@ -264,20 +264,20 @@ int main(int argc, char** argv) {
 
 	//add mouse callback function for specifying the rectangular region
 	cv::namedWindow(WINDOW_INTERACT, CV_WINDOW_AUTOSIZE);
-	setMouseCallback(WINDOW_INTERACT, doMouseCallback, 0);
+	cv::setMouseCallback(WINDOW_INTERACT, doMouseCallback, 0);
 
 	//add trackback function for selecting either foreground or background segments
 	char trackbarName[50];
 	int slider_class_max = 1;
 	sprintf(trackbarName, "Class (BG= 0, FG=1)= %d", slider_class_max);
-	createTrackbar(trackbarName, WINDOW_INTERACT, &segment_class,
+	cv::createTrackbar(trackbarName, WINDOW_INTERACT, &segment_class,
 			slider_class_max, on_trackbar);
 	sprintf(trackbarName, "Start training= %d", slider_class_max);
-	createTrackbar(trackbarName, WINDOW_INTERACT, &start_training,
+	cv::createTrackbar(trackbarName, WINDOW_INTERACT, &start_training,
 			slider_class_max, on_trackbar);
 
 	sprintf(trackbarName, "Reconfigure= %d", slider_class_max);
-	createTrackbar(trackbarName, WINDOW_INTERACT, &re_configure,
+	cv::createTrackbar(trackbarName, WINDOW_INTERACT, &re_configure,
 			slider_class_max, on_trackbar);
 
 	/*
@@ -323,8 +323,8 @@ int main(int argc, char** argv) {
 		videoSegmenter.addImage(img, outputMat);
 		all_segments = videoSegmenter.get_segments();
 		cout <<"videoSegmenter added"<<endl;
-		imshow("video segmentation", outputMat);
-		waitKey(1);
+		cv::imshow("video segmentation", outputMat);
+		cv::waitKey(1);
 
 		//if it is the first image
 		if (i == starting_frame) {

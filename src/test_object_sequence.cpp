@@ -37,10 +37,10 @@ using namespace videoseg;
 //finds the bounding rectangle of the slc
 void find_slc_bounding_box(Mat& detections, Rect& rect){
 	Mat pointsMat,mask;
-	cvtColor(detections,mask,CV_RGB2GRAY);
+	cv::cvtColor(detections,mask,CV_RGB2GRAY);
 	mask = mask > 0;
 	cv::findNonZero(mask,pointsMat);
-	rect=boundingRect(pointsMat);
+	rect=cv::boundingRect(pointsMat);
 }
 
 int main(int argc, char** argv) {
@@ -129,9 +129,9 @@ int main(int argc, char** argv) {
 		bool detected = slc.test_data(current_segs, img_1, depth_float, masks, debug,
 					slc_positions,slc_orientations);
 
-		imshow("detections",debug);
+		cv::imshow("detections",debug);
 
-		waitKey(50);
+		cv::waitKey(50);
 
 
 //		for(Segment *seg : current_segs){

@@ -92,7 +92,7 @@ void VisualRepresentation::compare_to(VisualRepresentation& visual_rep_2){
 		imshow("max atom_v2",max_atom.atom_ptr->segment_->getMatOriginalColour());
 		atom_u1.atom_ptr->similarity(max_atom.atom_ptr.get());
 
-		waitKey(0);
+		cv::waitKey(0);
 
 	}
 
