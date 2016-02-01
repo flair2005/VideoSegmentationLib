@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 				std::istreambuf_iterator<char>());
 		boost::split(clouds_list, content_clouds, boost::is_any_of("\t \n"));
 
-	ObjectDetector slc(ObjectDetector::TEST_MODE,svm_path);
+	ObjectDetector slc(ObjectDetector::TEST_MODE,svm_path,svm_path);
 
 
 

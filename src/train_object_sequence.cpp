@@ -260,7 +260,7 @@ int main(int argc, char** argv) {
 	videoSegmenter.init(scale_for_propagation, starting_scale, scales, gpu,
 			threshold);
 
-	ObjectDetector slc(ObjectDetector::TRAIN_MODE, svm_model_path);
+	ObjectDetector slc(ObjectDetector::TRAIN_MODE, svm_model_path,svm_model_path);
 
 	//add mouse callback function for specifying the rectangular region
 	cv::namedWindow(WINDOW_INTERACT, CV_WINDOW_AUTOSIZE);

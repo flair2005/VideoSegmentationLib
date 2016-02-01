@@ -77,13 +77,17 @@ QPoint FrameLabel::getMouseCursorPos()
 
 void FrameLabel::mouseReleaseEvent(QMouseEvent *ev)
 {
+
+    m_mouseData.row = ev->pos().y();
+    m_mouseData.col = ev->pos().x();
+
     // Update cursor position
     setMouseCursorPos(ev->pos());
     // On left mouse button release
     if(ev->button() == Qt::LeftButton)
-    {
+    {       
 
-        std::cout<<"left button pressed at x,y="<<m_box->left()<<" "<<m_box->top()<<std::endl;
+
         // Set leftButtonRelease flag to TRUE
         m_mouseData.leftButtonRelease = true;
         if (m_drawBox)
@@ -100,6 +104,10 @@ void FrameLabel::mouseReleaseEvent(QMouseEvent *ev)
             // Inform main window of event
             emit newMouseData(m_mouseData);
         }
+
+
+
+
         // Set leftButtonRelease flag to FALSE
         m_mouseData.leftButtonRelease = false;
     }
@@ -116,6 +124,7 @@ void FrameLabel::mouseReleaseEvent(QMouseEvent *ev)
             // Show context menu
             menu->exec(ev->globalPos());
         }
+
     }
 }
 
@@ -123,6 +132,7 @@ void FrameLabel::mousePressEvent(QMouseEvent *ev)
 {
     // Update cursor position
     setMouseCursorPos(ev->pos());;
+
     if(ev->button() == Qt::LeftButton)
     {
         // Start drawing box

@@ -25,6 +25,12 @@ include(${QT_USE_FILE})
 #find_package(OpenCV REQUIRED)
 #include_directories(${OpenCV_INCLUDE_DIRS})
 
+########
+# VTK
+########
+find_package(VTK REQUIRED)
+set(VTK_LIBRARIES vtkRendering vtkGraphics vtkHybrid QVTK)
+
 add_definitions(-Wall -g  -fopenmp -lgomp -march=native -std=c++11 -O4)
 
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -56,10 +62,10 @@ target_link_libraries(gui
   #Qt5::Widgets
     ${QT_QTCORE_LIBRARY}
     ${QT_QTGUI_LIBRARY}
-	segLib 
-	${Boost_LIBRARIES}
-	${PCL_LIBRARIES}
-	${OpenCV_LIBS}
-	
-#  ${OpenCV_LIBS}
-)
+    ${VTK_LIBRARIES}
+    VR_LIBRARY
+    segLib    
+    ${Boost_LIBRARIES}
+    ${PCL_LIBRARIES}
+    ${OpenCV_LIBS} )
+    #mrsmapLib mrsslamLib )

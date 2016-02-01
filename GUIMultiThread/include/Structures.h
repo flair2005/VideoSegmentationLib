@@ -66,6 +66,8 @@ typedef struct
     QRect selectionBox;
     bool leftButtonRelease;
     bool rightButtonRelease;
+    int row;
+    int col;
 } MouseData;
 
 typedef struct

@@ -32,6 +32,7 @@
 
 #ifndef PlaybackThread_H
 #define PlaybackThread_H
+#include "objectentity.h"
 #include <QMutex>
 #include <QThread>
 #include <QTime>
@@ -43,6 +44,7 @@
 #include "Structures.h"
 #include "segmentation.h"
 #include "Parameters.h"
+#include "VideoSegmentation.h"
 
 
 
@@ -55,17 +57,22 @@ class PlaybackThread : public QThread
 
     public:
         PlaybackThread(SharedImageBuffer *sharedImageBuffer,SegmentationParameters* seg_params);
+        PlaybackThread(SharedImageBuffer *sharedImageBuffer,SegmentationParameters* seg_params, bool videoSegmentation);
         void init();
         void stop();
-        void setPath(std::vector<std::string>& imagePaths);
+        void setPath(std::vector<std::string>& imagePaths,std::vector<std::string>& depthPaths);
         void activateTestMode(ObjectEntity* object_entity);
 
         int getInputSourceWidth();
         int getInputSourceHeight();
+        void activateVideoSegmentation();
+        SegmentationParameters* getSegmentationParameters();
+
 
 signals:
     void newFrame(const QImage& frame);
     void newSegmentation(const QImage& seg);
+    void newVideoSegmentation(const QImage& seg);
 
     private:
         void updateFPS(int);
@@ -87,26 +94,29 @@ signals:
 
 
         //new member attributes
-        std::vector<std::string> m_imagePaths;
+        std::vector<std::string> m_imagePaths,m_depthPaths;
         QImage m_frame;
         QImage m_segmentation;
 
         //parameters for segmentation
-        SegmentationParameters* m_seg_params;
-        int scale_for_propagation = 0;
-        int starting_scale = 2;
+        SegmentationParameters* m_seg_params;        
         //Utils utils;
-        int scales = 3;
+
         int gpu = 0;
         double threshold = 0.05; //0.05;
 
-        //test mode
+        //test object model mode
         bool test_mode = false;
         ObjectEntity* m_object_entity;
 
+        //video segmentation attributes
+        bool video_segmentation;
+        VideoSegmentation videoSegmenter;
 
-        void segment(cv::Mat& src,cv::Mat& dst);
+        void segment(Segmentation& segmentation,cv::Mat& src,cv::Mat& dst,std::vector<Segment*>& segments);
 
+        void video_segmentation_run();
+        void image_segmentation_run();
     protected:
         void run();
 
