@@ -34,8 +34,16 @@ public:
         return scales;
     }
 
+    void setScales(int s){
+        scales = s;
+    }
+
     int getStartingScale(){
         return starting_scale;
+    }
+
+    void setStartingScale(int start_scale){
+        starting_scale = start_scale;
     }
 
     int getScaleForPropagation(){

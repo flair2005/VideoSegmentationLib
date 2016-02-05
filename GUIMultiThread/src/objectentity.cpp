@@ -32,7 +32,7 @@ ObjectEntity::ObjectEntity(QString name,QString dir_path,QString svm_path, bool 
         std::string dir_path_string = folder_path.toUtf8().constData();
 
         std::cout << "opening svm file for testing model="<<svm_model_path<<endl;
-        m_detector_ = new ObjectDetector(ObjectDetector::TEST_MODE,svm_model_path,dir_path_string ,model_name.substr(0,model_name.size()-4));
+        m_detector_ = new ObjectDetector(ObjectDetector::TEST_MODE,svm_model_path,dir_path_string ,model_name);//.substr(0,model_name.size()-4));
     }
 }
 

@@ -129,8 +129,9 @@ void PlaybackThread::image_segmentation_run(){
             //m_object_entity->m_detector->
             vector<Mat> masks;
             cout <<"testing the object model. Size of the image="<<src.size()<<endl;
+            vector<Detection> detections;
             m_object_entity->m_detector_->test_data(segments,
-                                          src, depth_float, masks, debug );
+                                          src, depth_float, masks, debug,detections );
             m_frame = MatToQImage(debug);
         }
 

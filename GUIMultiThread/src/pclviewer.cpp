@@ -18,36 +18,39 @@ PCLViewer::PCLViewer (QWidget *parent) :
     // Connect point size slider
     connect (ui->horizontalSlider_p, SIGNAL (valueChanged (int)), this, SLOT (pSliderValueChanged (int)));
 
-    pSliderValueChanged (2);
+    //set the point size default value to 3
+    pSliderValueChanged (3);
     viewer->resetCamera ();
     viewer->addCoordinateSystem(0.1);
     ui->qvtkWidget->update ();
+
+
 
     pcs = new PCS();
 }
 
 void PCLViewer::setPC(CloudTPtr pc)
 {
-    viewer->addPointCloud (pc, "cloud");
+    viewer->addPointCloud (pc, "viewer");
     ui->qvtkWidget->update ();
 }
 
 void PCLViewer::setPCS(PCS* p)
 {
     pcs = p;
-    viewer->addPointCloud (pcs->pcs.at(0), "cloud");
+    viewer->addPointCloud (pcs->pcs.at(0), "viewer");
     ui->qvtkWidget->update ();
 }
 
 void PCLViewer::updatePC(CloudTPtr pc)
 {
-    viewer->updatePointCloud(pc, "cloud");
+    viewer->updatePointCloud(pc, "viewer");
     ui->qvtkWidget->update ();
 }
 
 void PCLViewer::pSliderValueChanged (int value)
 {
-    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, value, "cloud");
+    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, value, "viewer");
     ui->qvtkWidget->update ();
 }
 
