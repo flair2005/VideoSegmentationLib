@@ -5,7 +5,7 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH
 
 #set(OpenCV_DIR "~/workspace/opencv/build")
 find_package( OpenCV 2.4 REQUIRED   ml core gpu highgui)
-set(PCL_DIR "~/workspace/pcl/build/")
+#set(PCL_DIR "~/workspace/pcl/build/")
 find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 #add_definitions(${PCL_DEFINITIONS})
