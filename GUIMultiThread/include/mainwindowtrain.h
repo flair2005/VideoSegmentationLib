@@ -54,6 +54,9 @@ private:
     SegmentationParameters seg_params;
     Mat m_current_frame,m_current_depth_float;
     Segment* m_current_segment;
+    //stores the added segments for when we want to add the remaining ones
+    //as background
+    vector<Segment*> added_foreground_segments;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr current_pcl_cloud;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr current_pcl_cloud_rgba;
 
@@ -70,6 +73,8 @@ private:
     PCLViewer *pclViewer_raw,*pclViewer_detections;
     PCS *pcs_raw;
     Eigen::Vector4d geo_panel, geo_viewer;
+
+    Utils utils_;
 
 // functions    
     void display_cur_point_cloud();
@@ -121,6 +126,11 @@ private slots:
     void on_startScaleSpinBox_valueChanged(int arg1);
     void on_scalesSpinBox_valueChanged(int arg1);
     void on_actionEqualize_cameras_triggered();
+    void on_addRemainingPushButton_pressed();
+
+    void on_spSpinBox_valueChanged(int arg1);
+    void on_srSpinBox_valueChanged(int arg1);
+    void on_msizeSpinBox_valueChanged(int arg1);
 };
 
 #endif // MAINWINDOWTRAIN_H

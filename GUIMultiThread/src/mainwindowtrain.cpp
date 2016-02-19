@@ -86,6 +86,12 @@ MainWindowTrain::MainWindowTrain(QWidget *parent) :
 
 
 
+    //set the mean shift default parameters in the spin boxes
+    ui->spSpinBox->setValue(seg_params.getSP());
+    ui->srSpinBox->setValue(seg_params.getSR());
+    ui->msizeSpinBox->setValue(seg_params.getMinSize());
+
+
     //set the scale selector values
     ui->propScaleSpinBox->setValue(seg_params.getScaleForPropagation());
     int allowed_interval = seg_params.getScales()-seg_params.getStartingScale()-1;
@@ -94,8 +100,8 @@ MainWindowTrain::MainWindowTrain(QWidget *parent) :
     //set the training examples selector slider
     ui->trainingExamplesHorizontalSlider->setMaximum(0);
 
-    //by default we use Mean Shift
-    ui->surfaceRadioButton->toggle();
+    //by default we use Scharr
+    ui->scharrRadioButton->toggle();
     //set starting scale value
     ui->startScaleSpinBox->setValue(seg_params.getStartingScale());
     ui->scalesSpinBox->setValue(seg_params.getScales());
@@ -593,7 +599,7 @@ void MainWindowTrain::on_segFramePushButton_clicked()
            delete ms_segmentation;
        ms_segmentation = new MSSegmentation(tmp, false, seg_params.getScales(), seg_params.getStartingScale());
 
-       ms_segmentation->segment_pyramid(seg_params.getThreshold());
+       ms_segmentation->segment_pyramid(seg_params.getSP(),seg_params.getSR(),seg_params.getMinSize());
        ms_segmentation->map_segments(seg_params.getScaleForPropagation());
        mat_segmentation = ms_segmentation->getOutputSegmentsPyramid()[seg_params.getScaleForPropagation()];
 
@@ -630,6 +636,7 @@ void MainWindowTrain::on_addSegmentPushButton_pressed()
             train_object->frameData_.img = m_current_frame.clone();
             train_object->frameData_.depth_float = m_current_depth_float.clone();
         }
+        added_foreground_segments.push_back(m_current_segment);
         Segment* segment_copy = new Segment(*m_current_segment);
         train_object->frameData_.fg_segments.push_back(segment_copy);
         int number_fg_segms = train_object->frameData_.fg_segments.size();
@@ -768,6 +775,7 @@ void MainWindowTrain::add_training_data(){
 
         train_object->frameData_.fg_segments.clear();
         train_object->frameData_.bg_segments.clear();
+        added_foreground_segments.clear();
     }
 }
 
@@ -896,49 +904,61 @@ void MainWindowTrain::on_testFramePushButton_pressed()
 
     //first segment the frame
     on_segFramePushButton_clicked();
-
+    bool unify = true;
+    vector<cv::Mat> masks;
+    cv::Mat debug;
+    std::vector<Segment*> segments;
 
     if(test_object && segmentation){
         on_segFramePushButton_clicked();
-        std::vector<Segment*> segments = segmentation->getSegmentsPyramid()[seg_params.getScaleForPropagation()];
+        segments = segmentation->getSegmentsPyramid()[seg_params.getScaleForPropagation()];
+        unify = true;
+//        //m_object_entity->m_detector->
+//        vector<cv::Mat> masks;
+//        cv::Mat debug;
+//        cout <<"testing the object model. Size of the image="<<m_current_frame.size()<<endl;
+//        vector<Detection> detections;
+//        test_object->m_detector_->test_data(segments,
+//                                      m_current_frame, m_current_depth_float, masks, debug,detections );
+//        for(Detection& detection: detections){
+//            cout <<" detection confidence="<<detection.confidence<<endl;
+//        }
+//        QImage frame = MatToQImage(debug);
+//        updateFrame(frame);
+//        if(detections.size()>0){
+//           pclViewer_detections->updatePC(detections[0].cloud);
+//           pclViewer_detections->show();
 
-        //m_object_entity->m_detector->
-        vector<cv::Mat> masks;
-        cv::Mat debug;
-        cout <<"testing the object model. Size of the image="<<m_current_frame.size()<<endl;
-        vector<Detection> detections;
-        test_object->m_detector_->test_data(segments,
-                                      m_current_frame, m_current_depth_float, masks, debug,detections );
-        QImage frame = MatToQImage(debug);
-        updateFrame(frame);
-        if(detections.size()>0){
-           pclViewer_detections->updatePC(detections[0].cloud);
-           pclViewer_detections->show();
-
-        }
+//        }
     }
     else if(test_object && ms_segmentation){
         on_segFramePushButton_clicked();
-        std::vector<Segment*> segments = ms_segmentation->getPropagatedSegments();
+        segments = ms_segmentation->getPropagatedSegments();
 
         //m_object_entity->m_detector->
-        vector<cv::Mat> masks;
-        cv::Mat debug;
+
         cout <<"ms_segmentation. Testing the object model. Size of the image="<<m_current_frame.size()<<endl;
-        bool unify = false;
-        vector<Detection> detections;
-        test_object->m_detector_->test_data(segments,
-                                      m_current_frame, m_current_depth_float, masks, debug,detections, unify );
-        cout <<"> called m_detector_->test_data "<<endl;
-        QImage frame = MatToQImage(debug);
-        updateFrame(frame);
-        //update point cloud with the detections
-        if(detections.size()>0){
-           pclViewer_detections->updatePC(detections[0].cloud);
-           pclViewer_detections->show();
+        unify = false;
+    }
+    vector<Detection> detections;
 
-        }
+    test_object->m_detector_->test_data(segments,
+                                  m_current_frame, m_current_depth_float, masks, debug,detections, unify );
+    cout <<"> called m_detector_->test_data "<<endl;
+    for(Detection& detection: detections){
+        cout <<" detection confidence="<<detection.confidence<<endl;
+    }
+    QImage frame = MatToQImage(debug);
+    updateFrame(frame);
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr show_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+    for(Detection& d: detections)
+        utils_.addPoints(d.cloud,show_cloud);
 
+    //update point cloud with the detections
+    if(detections.size()>0){
+       //pclViewer_detections->updatePC(detections[0].cloud);
+       pclViewer_detections->updatePC(show_cloud);
+       pclViewer_detections->show();
 
     }
 
@@ -996,3 +1016,94 @@ void MainWindowTrain::on_actionEqualize_cameras_triggered()
 
 
 }
+
+//adds as background segments those that were not selected as foreground
+void MainWindowTrain::on_addRemainingPushButton_pressed()
+{
+     if(train_object && segmentation){
+         int added = 0;
+         std::vector<Segment*> segments = segmentation->getSegmentsPyramid()[seg_params.getScaleForPropagation()];
+         //iterate over the segments
+         for(Segment* segment: segments){
+             //if the segment is not in the foreground vector add it
+             bool is_foreground = false;
+             for(Segment* foreground : added_foreground_segments){
+
+                 if( foreground == segment)
+                     is_foreground = true;
+
+             }
+
+             if(!is_foreground){
+                 added++;
+                 train_object->frameData_.bg_segments.push_back(segment);
+             }
+
+
+         }
+         double value = ui->bgLcdNumber->value()+added;
+         ui->bgLcdNumber->display(value);
+
+     }
+     if(train_object && ms_segmentation){
+         int added = 0;
+         std::vector<Segment*> segments =  ms_segmentation->getPropagatedSegments();//  ms_segmentation->getSegmentsPyramid()[seg_params.getScaleForPropagation()];
+         //iterate over the segments
+         for(Segment* segment: segments){
+             //if the segment is not in the foreground vector add it
+             bool is_foreground = false;
+             for(Segment* foreground : added_foreground_segments){
+
+                 if( foreground == segment)
+                     is_foreground = true;
+
+             }
+
+             if(!is_foreground){
+                 added++;
+                 train_object->frameData_.bg_segments.push_back(segment);
+             }
+
+
+         }
+         double value = ui->bgLcdNumber->value()+added;
+         ui->bgLcdNumber->display(value);
+
+     }
+
+
+
+}
+
+/*
+ * changed the SP value of Mean Shift
+ *
+*/
+void MainWindowTrain::on_spSpinBox_valueChanged(int arg1)
+{
+    seg_params.setSP(arg1);
+
+}
+
+/*
+ * changed the SR value of Mean Shift
+ *
+*/
+void MainWindowTrain::on_srSpinBox_valueChanged(int arg1)
+{
+    cout <<" SR set to "<<arg1<<endl;
+    seg_params.setSR(arg1);
+}
+
+
+/*
+ * changed the min size value of Mean Shift
+ *
+*/
+void MainWindowTrain::on_msizeSpinBox_valueChanged(int arg1)
+{
+    seg_params.setMinSize(arg1);
+}
+
+
+

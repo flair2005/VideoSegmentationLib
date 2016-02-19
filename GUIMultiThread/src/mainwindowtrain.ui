@@ -35,8 +35,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1078</width>
-        <height>56</height>
+        <width>1651</width>
+        <height>51</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -157,7 +157,7 @@
        <rect>
         <x>1290</x>
         <y>60</y>
-        <width>551</width>
+        <width>591</width>
         <height>731</height>
        </rect>
       </property>
@@ -173,8 +173,8 @@
          <rect>
           <x>10</x>
           <y>260</y>
-          <width>481</width>
-          <height>401</height>
+          <width>241</width>
+          <height>411</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -279,6 +279,86 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="verticalLayoutWidget_5">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>260</y>
+          <width>261</width>
+          <height>411</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>SP</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spSpinBox"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>SR</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="srSpinBox"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Min Size</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="msizeSpinBox"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QLabel" name="label_12">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>230</y>
+          <width>181</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Scharr Parameters</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_13">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>230</y>
+          <width>221</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Mean Shift Parameters</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tabSegmentation">
        <attribute name="title">
@@ -320,7 +400,7 @@
          <rect>
           <x>10</x>
           <y>300</y>
-          <width>531</width>
+          <width>568</width>
           <height>351</height>
          </rect>
         </property>
@@ -330,14 +410,21 @@
            <item>
             <widget class="QPushButton" name="addSegmentPushButton">
              <property name="text">
-              <string>Add segment</string>
+              <string>Add FG</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="addBGpushButton">
              <property name="text">
-              <string>Add background</string>
+              <string>Add BG</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="addRemainingPushButton">
+             <property name="text">
+              <string>Remaining BG</string>
              </property>
             </widget>
            </item>
@@ -599,7 +686,7 @@
      <x>0</x>
      <y>0</y>
      <width>2049</width>
-     <height>50</height>
+     <height>34</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
