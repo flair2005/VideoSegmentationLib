@@ -70,7 +70,7 @@ private:
     //a pointer to the current object model to be trained
     ObjectEntity* train_object;
 
-    PCLViewer *pclViewer_raw,*pclViewer_detections;
+    PCLViewer *pclViewer_raw,*pclViewer_detections,*pclViewer_models;
     PCS *pcs_raw;
     Eigen::Vector4d geo_panel, geo_viewer;
 
@@ -131,6 +131,7 @@ private slots:
     void on_spSpinBox_valueChanged(int arg1);
     void on_srSpinBox_valueChanged(int arg1);
     void on_msizeSpinBox_valueChanged(int arg1);
+    void on_lowSamplingCheckBox_clicked(bool checked);
 };
 
 #endif // MAINWINDOWTRAIN_H

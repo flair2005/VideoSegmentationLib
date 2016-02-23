@@ -162,7 +162,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -583,6 +583,17 @@
             <widget class="QSlider" name="trainingExamplesHorizontalSlider">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <item>
+            <widget class="QCheckBox" name="lowSamplingCheckBox">
+             <property name="text">
+              <string>Low Sub Sampling</string>
              </property>
             </widget>
            </item>

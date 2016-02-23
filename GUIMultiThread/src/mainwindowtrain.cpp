@@ -84,6 +84,14 @@ MainWindowTrain::MainWindowTrain(QWidget *parent) :
     pclViewer_detections->setGeometry(geo_viewer[0]+geo_panel[2], geo_viewer[1], geo_viewer[2], geo_viewer[3]);
     pclViewer_detections->show();
 
+    //add PCL viewer for the models registered
+    pclViewer_models = new PCLViewer();
+    CloudTPtr cloud3(new CloudT);
+    pclViewer_models->setPC(cloud3);
+    pclViewer_models->setWindowTitle("Models");
+    pclViewer_models->setGeometry(geo_viewer[0]+geo_panel[2], geo_viewer[1], geo_viewer[2], geo_viewer[3]);
+    pclViewer_models->show();
+
 
 
     //set the mean shift default parameters in the spin boxes
@@ -951,14 +959,22 @@ void MainWindowTrain::on_testFramePushButton_pressed()
     QImage frame = MatToQImage(debug);
     updateFrame(frame);
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr show_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-    for(Detection& d: detections)
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr models_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+
+
+    for(Detection& d: detections){
         utils_.addPoints(d.cloud,show_cloud);
+        utils_.addPoints(d.model_cloud,models_cloud);
+    }
 
     //update point cloud with the detections
     if(detections.size()>0){
        //pclViewer_detections->updatePC(detections[0].cloud);
        pclViewer_detections->updatePC(show_cloud);
        pclViewer_detections->show();
+
+       pclViewer_models->updatePC(models_cloud);
+       pclViewer_models->show();
 
     }
 
@@ -1107,3 +1123,20 @@ void MainWindowTrain::on_msizeSpinBox_valueChanged(int arg1)
 
 
 
+
+void MainWindowTrain::on_lowSamplingCheckBox_clicked(bool checked)
+{
+    if(checked){
+        if(test_object)
+            test_object->m_detector_->activate_low_sub_sampling();
+        if(train_object)
+            train_object->m_detector_->activate_low_sub_sampling();
+    }
+    else{
+        if(test_object)
+            test_object->m_detector_->deactivate_low_sub_sampling();
+        if(train_object)
+            train_object->m_detector_->deactivate_low_sub_sampling();
+    }
+
+}
