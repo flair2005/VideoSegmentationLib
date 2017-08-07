@@ -1082,6 +1082,7 @@ void MainWindowTrain::on_addRemainingPushButton_pressed()
 
 
          }
+         cout <<" segments.size()="<<segments.size()<<" =="<<added_foreground_segments.size()<<" + "<<train_object->frameData_.bg_segments.size()<<endl;
          double value = ui->bgLcdNumber->value()+added;
          ui->bgLcdNumber->display(value);
 
@@ -1139,4 +1140,20 @@ void MainWindowTrain::on_lowSamplingCheckBox_clicked(bool checked)
             train_object->m_detector_->deactivate_low_sub_sampling();
     }
 
+}
+
+void MainWindowTrain::on_highSamplingcheckBox_clicked(bool checked)
+{
+    if(checked){
+        if(test_object)
+            test_object->m_detector_->activate_high_sub_sampling();
+        if(train_object)
+            train_object->m_detector_->activate_high_sub_sampling();
+    }
+    else{
+        if(test_object)
+            test_object->m_detector_->deactivate_high_sub_sampling();
+        if(train_object)
+            train_object->m_detector_->deactivate_high_sub_sampling();
+    }
 }

@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 	Utils utils;
 	int scales = 3;
 	int gpu = 0;
-	double threshold = 0.01; //0.05;
+	double threshold = 0.05; //0.05;
 	string input_img_path,output_path;
 	utils.parse_args(argc,argv,threshold,scales,starting_scale,scale_for_propagation,gpu,input_img_path,output_path);
 
@@ -52,6 +52,7 @@ int main(int argc, char** argv) {
 
 	std::vector<std::string> images_list;
 
+	cout <<"input_img_path="<<input_img_path<<endl;
 	std::ifstream file_colours(input_img_path);
 
 	std::string content_colour((std::istreambuf_iterator<char>(file_colours)),

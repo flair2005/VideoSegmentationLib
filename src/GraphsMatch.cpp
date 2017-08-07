@@ -349,6 +349,7 @@ void GraphsMatch::find_match() {
 //			}
 		}
 		visual_repr_1_.getAtoms()[i].atom_ptr->id_matched_to = max_index_v2;
+		cout <<" Node U1: "<<i<<" V2:"<<max_index_v2<<  " appearance score="<<appearance_scores_[i][max_index_v2]<<" structural_score="<<structural_scores_[i][max_index_v2] <<endl;
 	}
 
 	for (int i = 0; i < visual_repr_1_.getSegments(); i++) {
@@ -359,8 +360,8 @@ void GraphsMatch::find_match() {
 		Segment* seg2 = visual_repr_2_.getAtoms()[match].atom_ptr->segment_;
 
 		seg2->re_colour(seg1->getRandomColour());
-		//cout <<"node U1 "<<visual_repr_1_.getAtoms()[i]->id <<" matched to "<<match<<endl;
-		//cout <<"colours set as: "<<seg1->getRandomColour()<<" "<<seg2->getRandomColour()<<endl;
+		//cout <<"node U1 "<<visual_repr_1_.getAtoms()[i].id <<" matched to "<<match<<endl;
+		cout <<"colours set as: "<<seg1->getRandomColour()<<" "<<seg2->getRandomColour()<<endl;
 
 	}
 

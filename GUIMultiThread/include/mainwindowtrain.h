@@ -132,6 +132,7 @@ private slots:
     void on_srSpinBox_valueChanged(int arg1);
     void on_msizeSpinBox_valueChanged(int arg1);
     void on_lowSamplingCheckBox_clicked(bool checked);
+    void on_highSamplingcheckBox_clicked(bool checked);
 };
 
 #endif // MAINWINDOWTRAIN_H

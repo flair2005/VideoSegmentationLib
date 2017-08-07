@@ -92,8 +92,8 @@ ${PROJECT_SOURCE_DIR}/hungarian/hungarian.c
 #add_executable (compare src/compare.cpp)
 #target_link_libraries (compare VR_LIBRARY  ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib mrsmapLib  ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
-#add_executable (track src/track_sequence.cpp)
-#target_link_libraries (track VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib mrsmapLib  ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
+add_executable (track src/track_sequence.cpp)
+target_link_libraries (track VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib  ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
 
 #add_executable (testinterface src/testinterface.cpp)
 #target_link_libraries (testinterface VR_LIBRARY   ${GRAPHVIZ_CDT_LIBRARY} ${GRAPHVIZ_GVC_LIBRARY} ${GRAPHVIZ_CGRAPH_LIBRARY}  segLib mrsmapLib  ${Boost_LIBRARIES}  ${PCL_LIBRARIES} ${OpenCV_LIBS})
